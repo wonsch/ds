@@ -22,7 +22,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -96,7 +96,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -185,7 +185,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\WorkInsertPeer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkInsertPeer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\WorkQueue.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkQueue.h"
 				>
 			</File>
 		</Filter>
@@ -198,10 +210,6 @@
 				RelativePath=".\Main.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\WorkQueue.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="1 Simulator"
@@ -209,11 +217,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\Sim.cpp"
+				RelativePath=".\Simulator.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Sim.h"
+				RelativePath=".\Simulator.h"
 				>
 			</File>
 		</Filter>
@@ -246,6 +254,18 @@
 			</File>
 			<File
 				RelativePath=".\wRand.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="3 Data Structure"
+			>
+			<File
+				RelativePath=".\PeerInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PeerInfo.h"
 				>
 			</File>
 		</Filter>

@@ -3,27 +3,43 @@
 
 CWorkQueue::CWorkQueue()
 {
+	Number = 0;
 	WorkTail = &WorkHead;
 }
 
 CWorkQueue::~CWorkQueue()
 {
+	CWorkBase *PT = WorkHead.NextLink, *Temp;
+	while(PT != NULL)
+	{
+		Temp = PT;
+		PT = PT->NextLink;
+		delete Temp;
+	}
+}
+
+bool CWorkQueue::IsEmpty()
+{
+	return WorkHead.NextLink == NULL;
 }
 
 void CWorkQueue::Queue(CWorkBase *Work)
 {
-	WorkTail->NextWork = Work;
-	WorkTail = WorkTail->NextWork;
+	WorkTail->NextLink = Work;
+	WorkTail = WorkTail->NextLink;
 }
 
-CWorkBase *CWorkQueue::DeQueue()
+bool CWorkQueue::DeQueue(CWorkBase **Work, unsigned int *Number)
 {
-	if(IsEmpty() == true) return NULL;
+	if(IsEmpty() == true) return false;
 
-	CWorkBase *Result = WorkHead.NextWork;
-	WorkHead.NextWork = WorkHead.NextWork->NextWork;
+	this->Number++;
 
-	if(WorkTail == Result) WorkTail = &WorkHead;
+	if(Work != NULL) *Work = WorkHead.NextLink;
+	if(Number != NULL) *Number = this->Number;
 
-	return Result;
+	if(WorkTail == WorkHead.NextLink) WorkTail = &WorkHead;
+	WorkHead.NextLink = WorkHead.NextLink->NextLink;
+
+	return true;
 }

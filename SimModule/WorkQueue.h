@@ -8,12 +8,13 @@ public:
 	CWorkQueue();
 	~CWorkQueue();
 
-	void										Queue(CWorkBase *Work);
-	CWorkBase*									DeQueue();
+	bool										IsEmpty();
 
-	bool										IsEmpty() {return WorkHead.NextWork == NULL;}
+	void										Queue(CWorkBase *Work);
+	bool										DeQueue(CWorkBase **Work, unsigned int *Number);
 
 private:
+	unsigned int								Number;
 	CWorkBase									WorkHead;
 	CWorkBase*									WorkTail;
 };
