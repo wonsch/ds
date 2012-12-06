@@ -1,6 +1,9 @@
 #include "stdafx.h"
+#include "WorkQueue.h"
 #include "WorkInsertPeer.h"
+#include "WorkSendMessage.h"
 #include "PeerInfo.h"
+#include "ContentInfo.h"
 
 CWorkInsertPeer::CWorkInsertPeer(CSimulator *Simulator) : CWorkBase(Simulator)
 {
@@ -13,13 +16,13 @@ CWorkInsertPeer::~CWorkInsertPeer()
 void CWorkInsertPeer::Simulate(char *Log)
 {
 	char *LogPT = Log;
-	if(LogPT != NULL) LogPT+= sprintf(LogPT, "Insert a Peer.");
+	LogPT+= sprintf(LogPT, "    Insert a Peer. ");
 
 	// Create a peer.
 	CPeerInfo *PeerInfo = new CPeerInfo(++Sim->NewPeerID);
 
 	// Set neighbor peers.
-	// This method is not optimal.
+	// This is not optimal.
 	if(Sim->PeerInfoMap.GetCount() > 0)
 	{
 		unsigned int StartIndex = Sim->wRand() % Sim->PeerInfoMap.GetCount();
@@ -40,12 +43,43 @@ void CWorkInsertPeer::Simulate(char *Log)
 		}
 	}
 
-	// Insert a peer.
-	Sim->PeerInfoMap.SetAt(PeerInfo->GetPeerID(), PeerInfo);
-
-	if(LogPT != NULL)
+	// Set contents.
+	for(unsigned int ContentCount = 0;ContentCount < Sim->InitContentCount;ContentCount++)
 	{
-		LogPT+= sprintf(LogPT, "\n  ", PeerInfo->GetPeerID());
-		LogPT+= PeerInfo->GerProperties(LogPT);
+		// Create or get a random content.
+		unsigned int ContentID = Sim->wRand();
+		CContentInfo *ContentInfo;
+		if(Sim->ContentInfoMap.Lookup(ContentID, ContentInfo) == false)
+		{
+			ContentInfo = new CContentInfo(ContentID);
+			Sim->ContentInfoMap.SetAt(ContentID, ContentInfo);
+		}
+
+		// Insert a content.
+		PeerInfo->InsertContentInfo(ContentID, ContentInfo);
 	}
+
+	// Insert a peer.
+	Sim->PeerInfoMap.SetAt(PeerInfo->PeerID, PeerInfo);
+
+	// Notify neighbor peers.
+	CWorkQueue WorkQueue;
+	POSITION pos = PeerInfo->NeighborPeerIDMap.GetStartPosition();
+	while(pos != NULL)
+	{
+		unsigned int NeighborPeerID;
+		void *Temp;
+		PeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
+
+		CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, PeerInfo->PeerID, NeighborPeerID);
+		WorkSendMessage->DontIncreaseWorkNumber = true;
+		WorkSendMessage->Message = new CMessage(++PeerInfo->NewMessageID);
+		WorkSendMessage->Message->SetNotifyNull();
+		WorkQueue.QueueAtTail(WorkSendMessage);
+	}
+	Sim->InsertWork(Sim->Step, &WorkQueue, true);
+	WorkQueue.RemoveAll();
+
+	LogPT+= PeerInfo->GerProperties(LogPT);
+	LogPT+= sprintf(LogPT, "\n");
 }

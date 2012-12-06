@@ -3,12 +3,19 @@
 
 int main()
 {
-	CSimulator Sim;
-	Sim.InsertWorkInsertPeer(1, 3);
-	Sim.InsertWorkInsertPeer(2, 5);
-	Sim.InsertWorkInsertPeer(4, 2);
-	Sim.InsertWorkInsertPeer(8, 4);
-	Sim.SimulateToInfinity();
+	CSimulator Sim(0);
+	Sim.SetEnvironmentRandomly();
+	Sim.InsertWorkInsertPeer(1, 4);
+	Sim.InsertWorkSearchContent(3);
+
+	while(true)
+	{
+		Sim.SimulateCount(1);
+
+		char c = _getch();
+		if(c == 'e') break;
+	}
+	//Sim.SimulateToInfinity();
 
 	return 0;
 }

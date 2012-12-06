@@ -1,19 +1,24 @@
 #pragma once
 
+class CContentInfo;
+
 class CPeerInfo
 {
 public:
 	CPeerInfo(unsigned int PeerID);
 	~CPeerInfo();
 
-	unsigned int								GetPeerID() {return PeerID;}
-
 	bool										IsNeighborPeer(unsigned int PeerID);
 	void										InsertNeighborPeerID(unsigned int PeerID);
 
-	int											GerProperties(char *String);
+	void										InsertContentInfo(unsigned int ContentID, CContentInfo *ContentInfo);
 
-private:
+	int											GerProperties(char *String);
+	int											GetNeighborPeerIDs(char *String);
+
 	unsigned int								PeerID;
-	CAtlMap<unsigned int, void*>				NeighborPeerIDMap;
+	CAtlMap<unsigned int, void*>				NeighborPeerIDMap; // Map<PeerID, NULL>
+	CAtlMap<unsigned int, CContentInfo*>		ContentInfoMap; // Map<ContentID, ContentInfo>
+
+	unsigned int								NewMessageID;
 };

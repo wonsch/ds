@@ -3,14 +3,16 @@
 
 CWorkBase::CWorkBase()
 {
-	Sim = NULL;
 	NextLink = NULL;
+	Sim = NULL;
+	DontIncreaseWorkNumber = false;
 }
 
 CWorkBase::CWorkBase(CSimulator *Simulator)
 {
-	Sim = Simulator;
 	NextLink = NULL;
+	Sim = Simulator;
+	DontIncreaseWorkNumber = false;
 }
 
 CWorkBase::~CWorkBase()

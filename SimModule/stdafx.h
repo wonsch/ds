@@ -8,4 +8,5 @@
 #include <atlcoll.h>
 #include <assert.h>
 #include <stdio.h>
+#include <conio.h>
 #include "wRand.h"

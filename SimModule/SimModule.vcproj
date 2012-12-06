@@ -193,11 +193,43 @@
 				>
 			</File>
 			<File
+				RelativePath=".\WorkMessageBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkMessageBase.h"
+				>
+			</File>
+			<File
 				RelativePath=".\WorkQueue.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\WorkQueue.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkRecvMessage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkRecvMessage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkSearchContent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkSearchContent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkSendMessage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorkSendMessage.h"
 				>
 			</File>
 		</Filter>
@@ -260,6 +292,22 @@
 		<Filter
 			Name="3 Data Structure"
 			>
+			<File
+				RelativePath=".\ContentInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ContentInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Message.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Message.h"
+				>
+			</File>
 			<File
 				RelativePath=".\PeerInfo.cpp"
 				>

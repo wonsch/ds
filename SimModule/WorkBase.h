@@ -11,6 +11,7 @@ public:
 
 	virtual	void								Simulate(char *Log);
 
-	CSimulator*									Sim;
 	CWorkBase*									NextLink;
+	CSimulator*									Sim;
+	bool										DontIncreaseWorkNumber;
 };

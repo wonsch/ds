@@ -23,7 +23,35 @@ bool CWorkQueue::IsEmpty()
 	return WorkHead.NextLink == NULL;
 }
 
-void CWorkQueue::Queue(CWorkBase *Work)
+void CWorkQueue::RemoveAll()
+{
+	WorkHead.NextLink = NULL;
+	WorkTail = &WorkHead;
+}
+
+void CWorkQueue::QueueAtHead(CWorkQueue *WorkQueue)
+{
+	WorkQueue->WorkTail->NextLink = WorkHead.NextLink;
+	WorkHead.NextLink = WorkQueue->WorkHead.NextLink;
+	if(WorkTail == &WorkHead) WorkTail = WorkQueue->WorkTail;
+}
+
+void CWorkQueue::QueueAtHead(CWorkBase *Work)
+{
+	Work->NextLink = WorkHead.NextLink;
+	WorkHead.NextLink = Work;
+	if(WorkTail == &WorkHead) WorkTail = Work;
+}
+
+void CWorkQueue::QueueAtTail(CWorkQueue *Work)
+{
+	// Need to be tested.
+	if(Work->IsEmpty() == true) return;
+	WorkTail->NextLink = Work->WorkHead.NextLink;
+	WorkTail = Work->WorkTail;
+}
+
+void CWorkQueue::QueueAtTail(CWorkBase *Work)
 {
 	WorkTail->NextLink = Work;
 	WorkTail = WorkTail->NextLink;
@@ -33,7 +61,7 @@ bool CWorkQueue::DeQueue(CWorkBase **Work, unsigned int *Number)
 {
 	if(IsEmpty() == true) return false;
 
-	this->Number++;
+	if(WorkHead.NextLink->DontIncreaseWorkNumber == false) this->Number++;
 
 	if(Work != NULL) *Work = WorkHead.NextLink;
 	if(Number != NULL) *Number = this->Number;

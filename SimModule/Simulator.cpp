@@ -2,7 +2,9 @@
 #include "Simulator.h"
 #include "WorkQueue.h"
 #include "WorkInsertPeer.h"
+#include "WorkSearchContent.h"
 #include "PeerInfo.h"
+#include "ContentInfo.h"
 
 CSimulator::CSimulator(unsigned long RandomSeed)
 {
@@ -32,17 +34,23 @@ void CSimulator::Reset(unsigned long RandomSeed)
 
 void CSimulator::SetEnvironmentDefault()
 {
+	IsRandomEnrivonment = false;
 	InitNeighborPeerCount = 3;
+	InitContentCount = 5;
 }
 
 void CSimulator::SetEnvironmentRandomly()
 {
-	InitNeighborPeerCount = wRand() % 5;
+	IsRandomEnrivonment = true;
+	InitNeighborPeerCount = 1 + wRand() % 5;
+	InitContentCount = wRand() % 10;
 }
 
-void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount)
+void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount)
 {
+	IsRandomEnrivonment = false;
 	this->InitNeighborPeerCount = InitNeighborPeerCount;
+	this->InitContentCount = InitContentCount;
 }
 
 void CSimulator::SimulateCount(unsigned int StepCount)
@@ -64,6 +72,79 @@ void CSimulator::SimulateTo(unsigned int StepNumber)
 void CSimulator::InsertWorkInsertPeer(unsigned int StepNumber, unsigned int PeerCount)
 {
 	for(unsigned int i = 0;i < PeerCount;i++) InsertWork(StepNumber, new CWorkInsertPeer(this));
+}
+
+void CSimulator::InsertWorkSearchContent(unsigned int StepNumber, unsigned int PeerID, unsigned int ContentID)
+{
+	InsertWork(StepNumber, new CWorkSearchContent(this, PeerID, ContentID));
+}
+
+void CSimulator::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool AtHead)
+{
+	// Is StepNumber already passed?
+	if(StepNumber < Step) return;
+
+	// Create a WorkQueue or get an existing WorkQueue at the StepNumber.
+	CWorkQueue *WorkQueue;
+	if(WorkQueueMap.Lookup(StepNumber, WorkQueue) == false)
+	{
+		WorkQueue = new CWorkQueue();
+		WorkQueueMap.SetAt(StepNumber, WorkQueue);
+	}
+
+	// Insert the Work
+	if(AtHead == true) WorkQueue->QueueAtHead(Work);
+	else WorkQueue->QueueAtTail(Work);
+}
+
+void CSimulator::InsertWork(unsigned int StepNumber, CWorkBase *Work, bool AtHead)
+{
+	// Is StepNumber already passed?
+	if(StepNumber < Step) return;
+
+	// Create a WorkQueue or get an existing WorkQueue at the StepNumber.
+	CWorkQueue *WorkQueue;
+	if(WorkQueueMap.Lookup(StepNumber, WorkQueue) == false)
+	{
+		WorkQueue = new CWorkQueue();
+		WorkQueueMap.SetAt(StepNumber, WorkQueue);
+	}
+
+	// Insert the Work
+	if(AtHead == true) WorkQueue->QueueAtHead(Work);
+	else WorkQueue->QueueAtTail(Work);
+}
+
+CPeerInfo *CSimulator::GetRandomPeer()
+{
+	// Get a random peer which exists.
+	POSITION pos = PeerInfoMap.GetStartPosition();
+	if(pos == NULL) return NULL;
+
+	unsigned int StartIndex = wRand() % PeerInfoMap.GetCount();
+	for(unsigned int i = 0;i < StartIndex;i++) PeerInfoMap.GetNext(pos);
+
+	unsigned int PeerID;
+	CPeerInfo *PeerInfo;
+	PeerInfoMap.GetNextAssoc(pos, PeerID, PeerInfo);
+
+	return PeerInfo;
+}
+
+CContentInfo *CSimulator::GetRandomContent()
+{
+	// Get a random content which exists.
+	POSITION pos = ContentInfoMap.GetStartPosition();
+	if(pos == NULL) return NULL;
+
+	unsigned int StartIndex = wRand() % ContentInfoMap.GetCount();
+	for(unsigned int i = 0;i < StartIndex;i++) ContentInfoMap.GetNext(pos);
+
+	unsigned int ContentID;
+	CContentInfo *ContentInfo;
+	ContentInfoMap.GetNextAssoc(pos, ContentID, ContentInfo);
+
+	return ContentInfo;
 }
 
 void CSimulator::DeleteAllData()
@@ -89,6 +170,17 @@ void CSimulator::DeleteAllData()
 		delete PeerInfo;
 	}
 	PeerInfoMap.RemoveAll();
+
+	// Delete all PeerInfos.
+	pos = ContentInfoMap.GetStartPosition();
+	while(pos != NULL)
+	{
+		unsigned int ContentID;
+		CContentInfo *ContentInfo;
+		ContentInfoMap.GetNextAssoc(pos, ContentID, ContentInfo);
+		delete ContentInfo;
+	}
+	ContentInfoMap.RemoveAll();
 }
 
 bool CSimulator::SimulateOneStep()
@@ -114,14 +206,19 @@ bool CSimulator::SimulateOneStep()
 
 	// Get works from the WorkQueue and simulate each work.
 	CWorkBase *Work;
-	unsigned int Number;
-	while(WorkQueue->DeQueue(&Work, &Number) == true)
+	unsigned int PrevNumber = 0, NextNumber;
+	while(WorkQueue->DeQueue(&Work, &NextNumber) == true)
 	{
 		// Simulate a work.
 		char Log[4096];
 		Work->Simulate(Log);
-		printf("- Work %u> %s\n", Number, Log);
+		if(PrevNumber != NextNumber) printf("- Work %u>\n", NextNumber);
+		printf("%s", Log);
 		delete Work;
+		PrevNumber = NextNumber;
+
+		// Change the environment.
+		if(IsRandomEnrivonment == true) SetEnvironmentRandomly();
 	}
 	WorkQueueMap.RemoveKey(Step);
 	delete WorkQueue;
@@ -130,21 +227,4 @@ End:
 	printf("\n");
 
 	return true;
-}
-
-void CSimulator::InsertWork(unsigned int StepNumber, CWorkBase *Work)
-{
-	// Is StepNumber already passed?
-	if(StepNumber <= Step) return;
-
-	// Create a WorkQueue or get an existing WorkQueue at the StepNumber.
-	CWorkQueue *WorkQueue;
-	if(WorkQueueMap.Lookup(StepNumber, WorkQueue) == false)
-	{
-		WorkQueue = new CWorkQueue();
-		WorkQueueMap.SetAt(StepNumber, WorkQueue);
-	}
-
-	// Insert the Work
-	WorkQueue->Queue(Work);
 }
