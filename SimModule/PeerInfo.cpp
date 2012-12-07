@@ -9,6 +9,15 @@ CPeerInfo::CPeerInfo(unsigned int PeerID)
 
 CPeerInfo::~CPeerInfo()
 {
+	// Delete all PeerIDMessageIDs.
+	POSITION pos = PeerIDMessageIDMap.GetStartPosition();
+	while(pos != NULL)
+	{
+		unsigned int PeerID;
+		CAtlMap<unsigned int, void*> *MessageIDMap;
+		PeerIDMessageIDMap.GetNextAssoc(pos, PeerID, MessageIDMap);
+		delete MessageIDMap;
+	}
 }
 
 bool CPeerInfo::IsNeighborPeer(unsigned int PeerID)
@@ -28,6 +37,24 @@ void CPeerInfo::InsertContentInfo(unsigned int ContentID, CContentInfo *ContentI
 {
 	// Insert a content.
 	ContentInfoMap.SetAt(ContentID, ContentInfo);
+}
+
+bool CPeerInfo::TryInsertPeerIDMessageID(unsigned int PeerID, unsigned MessageID)
+{
+	CAtlMap<unsigned int, void*> *MessageIDMap;
+	if(PeerIDMessageIDMap.Lookup(PeerID, MessageIDMap) == false)
+	{
+		MessageIDMap = new CAtlMap<unsigned int, void*>();
+		PeerIDMessageIDMap.SetAt(PeerID, MessageIDMap);
+	}
+
+	void *Temp;
+	if(MessageIDMap->Lookup(MessageID, Temp) == true) return false;
+	else
+	{
+		MessageIDMap->SetAt(MessageID, NULL);
+		return true;
+	}
 }
 
 int CPeerInfo::GerProperties(char *String)

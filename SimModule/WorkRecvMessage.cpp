@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "WorkQueue.h"
 #include "WorkSendMessage.h"
 #include "WorkRecvMessage.h"
 #include "PeerInfo.h"
@@ -49,12 +50,14 @@ void CWorkRecvMessage::Simulate(char *Log)
 			CPeerInfo *DstPeerInfo;
 			if(Sim->PeerInfoMap.Lookup(DstPeerID, DstPeerInfo) == false) break;
 
-			// TODO:
 			// Should the peer transit this message to its neighbors?
-			// ...
+			// = Has the peer processed this message before?
+			if(DstPeerInfo->TryInsertPeerIDMessageID(Message->FromPeerID, Message->MessageID) == false) break;
 
 			// Send the search messages to neighbors.
 			LogPT+= sprintf(LogPT, ")\n    Transit a message. (NeighborPeerIDs =");
+
+			CWorkQueue WorkQueue;
 			POSITION pos = DstPeerInfo->NeighborPeerIDMap.GetStartPosition();
 			while(pos != NULL)
 			{
@@ -65,13 +68,16 @@ void CWorkRecvMessage::Simulate(char *Log)
 				if(NeighborPeerID != SrcPeerID && NeighborPeerID != Message->FromPeerID)
 				{
 					CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, NeighborPeerID);
+					WorkSendMessage->DontIncreaseWorkNumber = true;
 					WorkSendMessage->Message = new CMessage(Message->MessageID);
 					WorkSendMessage->Message->SetSearchContent(Message->FromPeerID, Message->ContentID);
-					Sim->InsertWork(Sim->Step + 1, WorkSendMessage);
+					WorkQueue.QueueAtTail(WorkSendMessage);
 
 					LogPT+= sprintf(LogPT, " %u", NeighborPeerID);
 				}
 			}
+			Sim->InsertWork(Sim->Step, &WorkQueue, true);
+			WorkQueue.RemoveAll();
 		}
 		break;
 	}

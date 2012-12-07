@@ -5,8 +5,9 @@ int main()
 {
 	CSimulator Sim(0);
 	Sim.SetEnvironmentRandomly();
-	Sim.InsertWorkInsertPeer(1, 4);
+	Sim.InsertWorkInsertPeer(1, 20);
 	Sim.InsertWorkSearchContent(3);
+	//Sim.SimulateToInfinity();
 
 	while(true)
 	{
@@ -15,7 +16,6 @@ int main()
 		char c = _getch();
 		if(c == 'e') break;
 	}
-	//Sim.SimulateToInfinity();
 
 	return 0;
 }
