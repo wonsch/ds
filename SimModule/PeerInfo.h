@@ -15,6 +15,8 @@ public:
 
 	bool										TryInsertPeerIDMessageID(unsigned int PeerID, unsigned MessageID);
 
+	unsigned int								GetNewMessageID() {return ++NewMessageID;}
+
 	int											GerProperties(char *String);
 	int											GetNeighborPeerIDs(char *String);
 

@@ -73,7 +73,7 @@ void CWorkInsertPeer::Simulate(char *Log)
 
 		CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, PeerInfo->PeerID, NeighborPeerID);
 		WorkSendMessage->DontIncreaseWorkNumber = true;
-		WorkSendMessage->Message = new CMessage(++PeerInfo->NewMessageID);
+		WorkSendMessage->Message = new CMessage(PeerInfo->GetNewMessageID());
 		WorkSendMessage->Message->SetNotifyNull();
 		WorkQueue.QueueAtTail(WorkSendMessage);
 	}

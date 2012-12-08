@@ -5,7 +5,7 @@ int main()
 {
 	CSimulator Sim(0);
 	Sim.SetEnvironmentRandomly();
-	Sim.InsertWorkInsertPeer(1, 20);
+	Sim.InsertWorkInsertPeer(1, 6);
 	Sim.InsertWorkSearchContent(3);
 	//Sim.SimulateToInfinity();
 

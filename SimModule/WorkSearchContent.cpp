@@ -58,7 +58,7 @@ void CWorkSearchContent::Simulate(char *Log)
 	// Send the search messages to neighbors.
 	CWorkQueue WorkQueue;
 	POSITION pos = PeerInfo->NeighborPeerIDMap.GetStartPosition();
-	if(pos != NULL) ++PeerInfo->NewMessageID;
+	if(pos != NULL) PeerInfo->GetNewMessageID();
 	while(pos != NULL)
 	{
 		unsigned int NeighborPeerID;
@@ -68,7 +68,7 @@ void CWorkSearchContent::Simulate(char *Log)
 		CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, PeerID, NeighborPeerID);
 		WorkSendMessage->DontIncreaseWorkNumber = true;
 		WorkSendMessage->Message = new CMessage(PeerInfo->NewMessageID);
-		WorkSendMessage->Message->SetSearchContent(PeerID, ContentID);
+		WorkSendMessage->Message->SetSearchContent(PeerID, ContentID, NULL, PeerID);
 		WorkQueue.QueueAtTail(WorkSendMessage);
 
 		LogPT+= sprintf(LogPT, " %u", NeighborPeerID);
