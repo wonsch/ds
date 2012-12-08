@@ -55,6 +55,24 @@ void CWorkSendMessage::Simulate(char *Log)
 			for(POSITION pos = Message->FloodPath.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->FloodPath.GetNext(pos));
 		}
 		break;
+	case EMESSAGE_ASK_GROUPING:
+		{
+
+			LogPT+= sprintf(LogPT, ", Message = EMESSAGE_ASK_GROUPING, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
+		}
+		break;
+
+	case EMSSAGE_REJECT_GROUPING:
+		{
+			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_REJECT_GROUPING, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
+		}
+		break;
+	case EMSSAGE_ACCEPT_GROUPING:
+		{
+			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_ACCEPT_GROUPING, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
+			for(POSITION pos = Message->GroupMemberID.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->GroupMemberID.GetNext(pos));
+		}
+		break;
 	}
 
 	LogPT+= sprintf(LogPT, ")\n");

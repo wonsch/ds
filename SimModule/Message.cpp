@@ -16,6 +16,30 @@ void CMessage::SetNotifyNull()
 {
 	Message = EMESSAGE_NOTIFY_NULL;
 }
+/*JIN*/
+void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int> *pGroupMemberID)
+{
+	Message = EMSSAGE_ACCEPT_GROUPING;
+	
+	this->GroupID = GroupID;
+	this->GroupMemberNumber = GroupMemberNumber;
+	GroupMemberID.RemoveAll();
+	if(pGroupMemberID != NULL) 
+		GroupMemberID.AddTailList(pGroupMemberID);
+
+}
+
+void CMessage::SetAskGrouping()
+{
+	Messgae = EMESSAGE_ASK_GROUPING;
+}
+
+void CMessage::SetAskGroupReject()
+{
+	Message = EMSSAGE_REJECT_GROUPING;
+}
+
+/*JIN*/
 
 void CMessage::SetSearchContent(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToInsertFloodPath)
 {
@@ -46,5 +70,5 @@ void CMessage::SetSearchContentResponsePath(unsigned int FromPeerID, unsigned in
 
 	FloodPath.RemoveAll();
 	if(PrevFloodPath != NULL) FloodPath.AddTailList(PrevFloodPath);
-	if(FloodPath.IsEmpty() != NULL && FloodPath.GetTail() == PeerIDToDeleteFloodPath) FloodPath.RemoveTailNoReturn();
+	if(FloodPath.IsEmpty() == false && FloodPath.GetTail() == PeerIDToDeleteFloodPath) FloodPath.RemoveTailNoReturn();
 }

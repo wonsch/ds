@@ -72,21 +72,43 @@ void CWorkInsertPeer::Simulate(char *Log)
 	POSITION pos = PeerInfo->NeighborPeerIDMap.GetStartPosition();
 
 	//
-	while(pos != NULL)
+	if(Sim->mode == NO_GROUPING)
 	{
-		unsigned int NeighborPeerID;
-		void *Temp;
-		PeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
+		while(pos != NULL)
+		{
+			unsigned int NeighborPeerID;
+			void *Temp;
+			PeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
 
-		CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, PeerInfo->PeerID, NeighborPeerID);
-		WorkSendMessage->DontIncreaseWorkNumber = true;
-		WorkSendMessage->Message = new CMessage(PeerInfo->GetNewMessageID());
-		WorkSendMessage->Message->SetNotifyNull();
-		WorkQueue.QueueAtTail(WorkSendMessage);
+			CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, PeerInfo->PeerID, NeighborPeerID);
+			WorkSendMessage->DontIncreaseWorkNumber = true;
+			WorkSendMessage->Message = new CMessage(PeerInfo->GetNewMessageID());
+			WorkSendMessage->Message->SetNotifyNull();
+			WorkQueue.QueueAtTail(WorkSendMessage);
+		}
 	}
+	
 
 	/*jin*/
-	// Send Message-ASKGROUPING to neighbors
+	// Send Message-ASKGROUPING to neighbors instead of NOTIFICATION MSG
+
+	else if(Sim->mode = GROUPING)
+	{
+		while(pos != NULL)
+		{
+			unsigned int NeighborPeerID;
+			void *Temp;
+			PeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
+			CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, PeerInfo->PeerID, NeighborPeerID);
+			WorkSendMessage->DontIncreaseWorkNumber = true;
+			WorkSendMessage->Message = new CMessage(PeerInfo->GetNewMessageID());
+			WorkSendMessage->Message->SetAskGrouping();
+			WorkQueue.QueueAtTail(WorkSendMessage);
+
+
+		}
+	}
+	
 	/*jin*/
 
 	Sim->InsertWork(Sim->Step, &WorkQueue, true);

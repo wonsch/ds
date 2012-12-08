@@ -17,11 +17,17 @@ CSimulator::~CSimulator()
 	DeleteAllData();
 }
 /*JIN*/
-void CSinulator::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
+void CSimulator::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
 {
 	GroupMaxNumber = MaxNumber;
 }
 
+void CSimulator::SetMode( int m)
+{
+	mode = m;
+}
+
+/*JIN*/
 void CSimulator::Reset(unsigned long RandomSeed)
 {
 	Step = 0;

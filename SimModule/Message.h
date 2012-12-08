@@ -32,8 +32,13 @@ public:
 	CAtlList<unsigned int>						FloodPath;
 
 	/*JIN*/
+	void										SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int>* pGroupMemberID);
+	void										SetAskGrouping();
+	void										SetAskGroupReject();
 	unsigned int								GroupID;
-	unsigned									GroupMemberNumber;
+	unsigned int								GroupMemberNumber;
 	CAtlList<unsigned int>						GroupMemberID;
+
+	/*JIN*/
 
 };

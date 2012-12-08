@@ -7,6 +7,13 @@ class CWorkBase;
 class CPeerInfo;
 class CContentInfo;
 
+
+enum EMode
+{
+	NO_GROUPING = 0,
+	GROUPING,
+};
+
 class CSimulator
 {
 public:
@@ -40,6 +47,11 @@ public:
 	/*   JIN    */
 
 	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
+
+	unsigned int								GroupMaxNumber;
+	void										SetMode(int m);
+	int											mode;
+
 	/*   JIN    */
 private:
 	void										DeleteAllData();
@@ -54,6 +66,7 @@ public:
 	unsigned int								InitNeighborPeerCount;
 	unsigned int								InitContentCount;
 
+
 	////////////////////////////////////////////////////////////////
 	// Simulation data
 	////////////////////////////////////////////////////////////////
@@ -67,9 +80,4 @@ public:
 
 	CwRand										wRand;
 
-	/*   JIN    */
-	
-	unsigned int								GroupMaxNumber;
-
-	/*   JIN    */
 };
