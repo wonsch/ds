@@ -20,6 +20,11 @@ void CWorkInsertPeer::Simulate(char *Log)
 
 	// Create a peer.
 	CPeerInfo *PeerInfo = new CPeerInfo(++Sim->NewPeerID);
+	
+	/*JIN*/
+	PeerInfo->groupMemberNumber = 1;
+	PeerInfo->groupID = -1;
+	/*JIN*/
 
 	// Set neighbor peers.
 	// This is not optimal.
@@ -65,6 +70,8 @@ void CWorkInsertPeer::Simulate(char *Log)
 	// Notify neighbor peers.
 	CWorkQueue WorkQueue;
 	POSITION pos = PeerInfo->NeighborPeerIDMap.GetStartPosition();
+
+	//
 	while(pos != NULL)
 	{
 		unsigned int NeighborPeerID;
@@ -77,6 +84,11 @@ void CWorkInsertPeer::Simulate(char *Log)
 		WorkSendMessage->Message->SetNotifyNull();
 		WorkQueue.QueueAtTail(WorkSendMessage);
 	}
+
+	/*jin*/
+	// Send Message-ASKGROUPING to neighbors
+	/*jin*/
+
 	Sim->InsertWork(Sim->Step, &WorkQueue, true);
 	WorkQueue.RemoveAll();
 

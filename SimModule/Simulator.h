@@ -37,6 +37,10 @@ public:
 	CPeerInfo*									GetRandomPeer();
 	CContentInfo*								GetRandomContent();
 
+	/*   JIN    */
+
+	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
+	/*   JIN    */
 private:
 	void										DeleteAllData();
 
@@ -62,4 +66,10 @@ public:
 	CAtlMap<unsigned int, CContentInfo*>		ContentInfoMap; // Map<ContentID, ContentInfo>
 
 	CwRand										wRand;
+
+	/*   JIN    */
+	
+	unsigned int								GroupMaxNumber;
+
+	/*   JIN    */
 };

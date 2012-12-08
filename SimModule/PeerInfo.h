@@ -26,4 +26,22 @@ public:
 	CAtlMap<unsigned int, CAtlMap<unsigned int, void*>*> PeerIDMessageIDMap; // Map<PeerID, Map<MessageID, NULL>>
 
 	unsigned int								NewMessageID;
+
+	/* JIN */
+	unsigned int groupID;
+	unsigned int groupMemberNumber;
+
+	CAtlMap<unsigned int, void*> GroupPeerIDMap; // group peer id
+	CAtlMap<unsigned int, CAtlMap<unsigned int, CContentInfo*>*> NeighborContentInfoList;  //the info of neighbor content
+	
+
+											 
+	//if there is no same contnetID of the neighborPeerID, insert the info 
+	bool										InserNeighborContentID(unsigned int NeighborPeerID, unsigned int ContentID); 
+	
+	
+
+
+
+	/* JIN */
 };

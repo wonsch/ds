@@ -7,6 +7,9 @@ enum EMessage
 	EMESSAGE_SEARCH_CONTENT,
 	EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE,
 	EMESSAGE_SEARCH_CONTENT_RESPONSE_PATH,
+	EMESSAGE_ASK_GROUPING,
+	EMSSAGE_REJECT_GROUPING,
+	EMSSAGE_ACCEPT_GROUPING,
 };
 
 class CMessage
@@ -27,4 +30,10 @@ public:
 	unsigned int								ContentID;
 
 	CAtlList<unsigned int>						FloodPath;
+
+	/*JIN*/
+	unsigned int								GroupID;
+	unsigned									GroupMemberNumber;
+	CAtlList<unsigned int>						GroupMemberID;
+
 };

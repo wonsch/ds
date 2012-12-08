@@ -16,13 +16,18 @@ CSimulator::~CSimulator()
 	// Free all allocated memory
 	DeleteAllData();
 }
+/*JIN*/
+void CSinulator::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
+{
+	GroupMaxNumber = MaxNumber;
+}
 
 void CSimulator::Reset(unsigned long RandomSeed)
 {
 	Step = 0;
 
 	NewPeerID = 0;
-
+	
 	wRand.SetSeed(RandomSeed);
 
 	// Free all allocated memory
@@ -30,6 +35,9 @@ void CSimulator::Reset(unsigned long RandomSeed)
 
 	// Set environment to default 
 	SetEnvironmentDefault();
+
+	/*JIN*/
+	GroupMaxNumber = 0;
 }
 
 void CSimulator::SetEnvironmentDefault()
