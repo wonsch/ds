@@ -9,4 +9,13 @@ public:
 	~CWorkRecvMessage();
 
 	virtual	void								Simulate(char *Log);
+
+private:
+	CPeerInfo*									DstPeerInfo;
+
+	int											MessageEmpty(char *Log);
+	int											MessageNotifyNull(char *Log);
+	int											MessageSearchContent(char *Log);
+	int											MessageSearchContentResponseSource(char *Log);
+	int											MessageSearchContentResponsePath(char *Log);
 };

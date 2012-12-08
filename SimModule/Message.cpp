@@ -46,5 +46,5 @@ void CMessage::SetSearchContentResponsePath(unsigned int FromPeerID, unsigned in
 
 	FloodPath.RemoveAll();
 	if(PrevFloodPath != NULL) FloodPath.AddTailList(PrevFloodPath);
-	if(FloodPath.IsEmpty() != NULL && FloodPath.GetTail() == PeerIDToDeleteFloodPath) FloodPath.RemoveTailNoReturn();
+	if(FloodPath.IsEmpty() == false && FloodPath.GetTail() == PeerIDToDeleteFloodPath) FloodPath.RemoveTailNoReturn();
 }
