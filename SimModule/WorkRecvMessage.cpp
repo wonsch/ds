@@ -111,11 +111,20 @@ int CWorkRecvMessage::MessageSearchContent(char *Log)
 		WorkQueue.RemoveAll();
 
 		LogPT+= sprintf(LogPT, ")\n    Response content searching message. (");
+
+		CAtlString String;
+		String.Format("Step %u : Peer %u has a content %08X. (FromPeerID = %u, Hops = %u)\n", Sim->Step, DstPeerID, Message->ContentID, SrcPeerID, Message->FloodPath.GetCount());
+		Sim->AttachLog(String);
+
+		Sim->StatisticsTotalSearchContentHopCount+= Message->FloodPath.GetCount();
+
 		return LogPT - Log;
 	}
 
 	// Send the search messages to neighbors.
 	LogPT+= sprintf(LogPT, ")\n    Transit content searching message. (NeighborPeerIDs =");
+
+	if(Message->FloodPath.GetCount() >= Sim->InitMaxFloodHopCount) return LogPT - Log;
 
 	// Transit this message to neighbors.
 	CWorkQueue WorkQueue;
@@ -147,6 +156,11 @@ int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log)
 	char *LogPT = Log;
 
 	// TODO: The peer received a response of searching content.
+	Sim->StatisticsTotalSearchContentSuccessCount++;
+	CAtlString String;
+	String.Format("Step %u : Peer %u found a content %08X at peer %u.\n", Sim->Step, SrcPeerID, Message->ContentID, DstPeerID);
+	Sim->AttachLog(String);
+
 	LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X", Message->FromPeerID, Message->ContentID);
 
 	return LogPT - Log;

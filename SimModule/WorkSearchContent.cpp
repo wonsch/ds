@@ -76,5 +76,9 @@ void CWorkSearchContent::Simulate(char *Log)
 	Sim->InsertWork(Sim->Step, &WorkQueue, true);
 	WorkQueue.RemoveAll();
 
+	CAtlString String;
+	String.Format("Step %u : Peer %u searches a content %08X.\n", Sim->Step, PeerID, ContentID);
+	Sim->AttachLog(String);
+
 	LogPT+= sprintf(LogPT, ")\n");
 }

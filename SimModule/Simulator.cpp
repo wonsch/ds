@@ -8,6 +8,8 @@
 
 CSimulator::CSimulator(unsigned long RandomSeed)
 {
+	Verbose = true;
+
 	Reset(RandomSeed);
 }
 
@@ -19,11 +21,17 @@ CSimulator::~CSimulator()
 
 void CSimulator::Reset(unsigned long RandomSeed)
 {
+	Log = "";
+
 	Step = 0;
 
 	NewPeerID = 0;
 
 	wRand.SetSeed(RandomSeed);
+
+	StatisticsTotalSearchContentCount = 0;
+	StatisticsTotalSearchContentSuccessCount = 0;
+	StatisticsTotalSearchContentHopCount = 0;
 
 	// Free all allocated memory
 	DeleteAllData();
@@ -35,22 +43,25 @@ void CSimulator::Reset(unsigned long RandomSeed)
 void CSimulator::SetEnvironmentDefault()
 {
 	IsRandomEnrivonment = false;
-	InitNeighborPeerCount = 3;
+	InitNeighborPeerCount = 1;
 	InitContentCount = 5;
+	InitMaxFloodHopCount = 5;
 }
 
 void CSimulator::SetEnvironmentRandomly()
 {
 	IsRandomEnrivonment = true;
-	InitNeighborPeerCount = 1 + wRand() % 5;
+	InitNeighborPeerCount = 1 + wRand() % 3;
 	InitContentCount = wRand() % 10;
+	InitMaxFloodHopCount = 5;
 }
 
-void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount)
+void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount, unsigned int InitMaxFloodHopCount)
 {
 	IsRandomEnrivonment = false;
 	this->InitNeighborPeerCount = InitNeighborPeerCount;
 	this->InitContentCount = InitContentCount;
+	this->InitMaxFloodHopCount = InitMaxFloodHopCount;
 }
 
 void CSimulator::SimulateCount(unsigned int StepCount)
@@ -76,6 +87,8 @@ void CSimulator::InsertWorkInsertPeer(unsigned int StepNumber, unsigned int Peer
 
 void CSimulator::InsertWorkSearchContent(unsigned int StepNumber, unsigned int PeerID, unsigned int ContentID)
 {
+	StatisticsTotalSearchContentCount++;
+
 	InsertWork(StepNumber, new CWorkSearchContent(this, PeerID, ContentID));
 }
 
@@ -147,6 +160,29 @@ CContentInfo *CSimulator::GetRandomContent()
 	return ContentInfo;
 }
 
+CAtlString CSimulator::GetStatistics()
+{
+	CAtlString String;
+	String.AppendFormat("Total Peers : %u\n", PeerInfoMap.GetCount());
+	String.AppendFormat("Total Contents : %u\n", ContentInfoMap.GetCount());
+	String.AppendFormat("Total Search Content : %u\n", StatisticsTotalSearchContentCount);
+	String.AppendFormat("Total Search Content Success/Failure : %u / %u\n", StatisticsTotalSearchContentSuccessCount, StatisticsTotalSearchContentCount - StatisticsTotalSearchContentSuccessCount);
+	if(StatisticsTotalSearchContentSuccessCount > 0)
+		String.AppendFormat("Total Search Content Average Hops : %.1f\n", (double)StatisticsTotalSearchContentHopCount / StatisticsTotalSearchContentSuccessCount);
+
+	return String;
+}
+
+void CSimulator::AttachLog(CAtlString &String)
+{
+	Log+= String;
+}
+
+CAtlString &CSimulator::GetLog()
+{
+	return Log;
+}
+
 void CSimulator::DeleteAllData()
 {
 	// Delete all WorkQueues.
@@ -194,7 +230,7 @@ bool CSimulator::SimulateOneStep()
 
 	// Increase the step that will be simulated.
 	Step++;
-	printf("*** Step %u\n", Step);
+	if(Verbose == true) printf("*** Step %u\n", Step);
 
 	// Get the WorkQueue that contains a work list at this Step.
 	CWorkQueue *WorkQueue;
@@ -212,8 +248,11 @@ bool CSimulator::SimulateOneStep()
 		// Simulate a work.
 		char Log[4096];
 		Work->Simulate(Log);
-		if(PrevNumber != NextNumber) printf("- Work %u>\n", NextNumber);
-		printf("%s", Log);
+		if(Verbose == true)
+		{
+			if(PrevNumber != NextNumber) printf("- Work %u>\n", NextNumber);
+			printf("%s", Log);
+		}
 		delete Work;
 		PrevNumber = NextNumber;
 
@@ -224,7 +263,7 @@ bool CSimulator::SimulateOneStep()
 	delete WorkQueue;
 
 End:
-	printf("\n");
+	if(Verbose == true) printf("\n");
 
 	return true;
 }

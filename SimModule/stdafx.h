@@ -6,6 +6,7 @@
 
 #include <afx.h>
 #include <atlcoll.h>
+#include <atlstr.h>
 #include <assert.h>
 #include <stdio.h>
 #include <conio.h>
