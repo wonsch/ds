@@ -25,16 +25,24 @@ void CWorkInsertPeer::Simulate(char *Log)
 	// This is not optimal.
 	if(Sim->PeerInfoMap.GetCount() > 0)
 	{
+		unsigned int NeighborPeerCount;
+		if(Sim->InitNeighborPeerCount == SIM_RANDOM_VALUE)
+		{
+			if(SIM_RANDOM_NEIGHBOR_RANGE == 2) NeighborPeerCount = 1 + ((Sim->wRand() % 100) < 50);
+			else NeighborPeerCount = 1 + Sim->wRand() % SIM_RANDOM_NEIGHBOR_RANGE;
+		}
+		else NeighborPeerCount = Sim->InitNeighborPeerCount;
+
 		unsigned int StartIndex = Sim->wRand() % Sim->PeerInfoMap.GetCount();
 		POSITION pos = Sim->PeerInfoMap.GetStartPosition();
 		for(unsigned int j = 0;j < StartIndex;j++) Sim->PeerInfoMap.GetNext(pos);
 		unsigned int StartPeerID = Sim->PeerInfoMap.GetKeyAt(pos), PeerID = StartPeerID;
-		for(unsigned int NeighborCount = 0;NeighborCount < Sim->InitNeighborPeerCount;)
+		for(unsigned int i = 0;i < NeighborPeerCount;)
 		{
 			if(PeerInfo->IsNeighborPeer(PeerID) == false)
 			{
 				PeerInfo->InsertNeighborPeerID(PeerID);
-				NeighborCount++;
+				i++;
 			}
 			Sim->PeerInfoMap.GetNext(pos);
 			if(pos == NULL) pos = Sim->PeerInfoMap.GetStartPosition();
@@ -44,7 +52,11 @@ void CWorkInsertPeer::Simulate(char *Log)
 	}
 
 	// Set contents.
-	for(unsigned int ContentCount = 0;ContentCount < Sim->InitContentCount;ContentCount++)
+	unsigned int ContentCount;
+	if(Sim->InitContentCount == SIM_RANDOM_VALUE) ContentCount = Sim->wRand() % 10;
+	else ContentCount = Sim->InitContentCount;
+
+	for(unsigned int i = 0;i < ContentCount;i++)
 	{
 		// Create or get a random content.
 		unsigned int ContentID = Sim->wRand();

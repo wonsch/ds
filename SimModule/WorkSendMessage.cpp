@@ -64,4 +64,6 @@ void CWorkSendMessage::Simulate(char *Log)
 	WorkRecvMessage->Message = Message;
 	Message = NULL;
 	Sim->InsertWork(Sim->Step + 1, WorkRecvMessage);
+
+	Sim->StatisticsTotalMessageCount++;
 }
