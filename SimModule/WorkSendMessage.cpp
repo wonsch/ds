@@ -44,7 +44,7 @@ void CWorkSendMessage::Simulate(char *Log)
 	case EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE:
 		// Response a searching content message to source.
 		{
-			LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X", Message->FromPeerID, Message->ContentID);
+			LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X, Hops = %u", Message->FromPeerID, Message->ContentID, Message->Hops);
 		}
 		break;
 

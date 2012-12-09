@@ -125,7 +125,7 @@ int CWorkRecvMessage::MessageAskGrouping(char *Log)
 
 
 	}
-	else  // 그룹 꽉 찾음
+	else  // 그룹 꽉 찼음
 	{
 		// 2. 가능 x  reject_grouping msg 보내기
 		WorkSendMessage->Message->SetAskGroupReject();  //other그룹에 넣기
@@ -174,39 +174,55 @@ int CWorkRecvMessage::MessageSearchContent(char *Log)
 	// Insert a peer into the neighbor.
 	DstPeerInfo->InsertNeighborPeerID(SrcPeerID);
 
-	// Should the peer transit this message to its neighbors?
-	// = Has the peer processed this message before?
+	// Should this peer transit this message to its neighbors?
+	// = Has this peer processed this message before?
 	if(DstPeerInfo->TryInsertPeerIDMessageID(Message->FromPeerID, Message->MessageID) == false) return LogPT - Log;
 
-	// Does the peer have the content?
-	// TODO: 진영 - 현재 내가 갖고 있나만 확인하는데, 캐시에서도 있나 확인하도록 추가
+	// Does this peer have the content?
+	// or know other peers which have the content? (cache)
+	int FoundMode = 0;
+	unsigned int FoundPeerID;
 	CContentInfo *ContentInfo;
+	CAtlList<unsigned int> *PeerIDList;
 	if(DstPeerInfo->ContentInfoMap.Lookup(Message->ContentID, ContentInfo) == true)
 	{
+		FoundMode = 1;
+		FoundPeerID = DstPeerInfo->PeerID;
+	}
+	else if(Sim->CacheMode == MODE_CACHE_ON && (PeerIDList = DstPeerInfo->FindContentIDPeerIDList(Message->ContentID)) != NULL)
+	{
+		FoundMode = 2;
+		FoundPeerID = PeerIDList->GetHead();
+	}
+
+	// If this peer have the content or know peers which have the content.
+	if(FoundMode != 0)
+	{
+		EResponseFrom ResponseFrom = (FoundMode == 1 ? ERESPONSE_FROM_SOURCE : ERESPONSE_FROM_CACHE);
 		CWorkQueue WorkQueue;
 
 		// Response to a peer which made a original request.
 		CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, Message->FromPeerID);
 		WorkSendMessage->Message = new CMessage(DstPeerInfo->GetNewMessageID());
-		WorkSendMessage->Message->SetSearchContentResponseSource(DstPeerInfo->PeerID, Message->ContentID);
+		WorkSendMessage->Message->SetSearchContentResponseSource(FoundPeerID, Message->ContentID, Message->FloodPath.GetCount(), ResponseFrom);
 		WorkQueue.QueueAtTail(WorkSendMessage);
 
 		// Response to a previous peer to transmit.
 		WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, SrcPeerID);
 		WorkSendMessage->Message = new CMessage(DstPeerInfo->GetNewMessageID());
-		WorkSendMessage->Message->SetSearchContentResponsePath(DstPeerInfo->PeerID, Message->ContentID, &Message->FloodPath, DstPeerInfo->PeerID);
+		WorkSendMessage->Message->SetSearchContentResponsePath(DstPeerInfo->PeerID, Message->ContentID, &Message->FloodPath, DstPeerInfo->PeerID, ResponseFrom);
 		WorkQueue.QueueAtTail(WorkSendMessage);
 
 		Sim->InsertWork(Sim->Step, &WorkQueue, true);
 		WorkQueue.RemoveAll();
 
-		LogPT+= sprintf(LogPT, ")\n    Response content searching message. (");
+		LogPT+= sprintf(LogPT, ")\n    Response content searching message. (From = ");
+		if(ResponseFrom == ERESPONSE_FROM_SOURCE) LogPT+= sprintf(LogPT, "Source");
+		else LogPT+= sprintf(LogPT, "Cache");
 
 		CAtlString String;
-		String.Format("Step %u : Peer %u has a content %08X. (FromPeerID = %u, Hops = %u)\n", Sim->Step, DstPeerID, Message->ContentID, SrcPeerID, Message->FloodPath.GetCount());
+		String.Format("Step %u : Peer %u has a content %08X. (FromPeerID = %u, Hops = %u, ResponseFrom = %s)\n", Sim->Step, DstPeerID, Message->ContentID, Message->FromPeerID, Message->FloodPath.GetCount(), (ResponseFrom == ERESPONSE_FROM_SOURCE ? "Source" : "Cache"));
 		Sim->AttachLog(String);
-
-		Sim->StatisticsTotalSearchContentHopCount+= Message->FloodPath.GetCount();
 
 		return LogPT - Log;
 	}
@@ -246,12 +262,18 @@ int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log)
 	char *LogPT = Log;
 
 	// TODO: The peer received a response of searching content.
-	Sim->StatisticsTotalSearchContentSuccessCount++;
+	if(DstPeerInfo->MinumumSearchContentHops > Message->Hops)
+	{
+		DstPeerInfo->MinumumSearchContentHops = Message->Hops;
+		Sim->StatisticsTotalSearchContentSuccessCount++;
+		Sim->StatisticsTotalSearchContentHopCount+= Message->Hops;
+	}
+
 	CAtlString String;
-	String.Format("Step %u : Peer %u found a content %08X at peer %u.\n", Sim->Step, SrcPeerID, Message->ContentID, DstPeerID);
+	String.Format("Step %u : Peer %u found a content %08X. (SrcPeerID = %u, FromPeerID = %u, Hops = %u, ResponseFrom = %s).\n", Sim->Step, DstPeerID, Message->ContentID, SrcPeerID, Message->FromPeerID, Message->Hops, (Message->ResponseFrom == ERESPONSE_FROM_SOURCE ? "Source" : "Cache"));
 	Sim->AttachLog(String);
 
-	LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X", Message->FromPeerID, Message->ContentID);
+	LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X, Hops = %u", Message->FromPeerID, Message->ContentID, Message->Hops);
 
 	return LogPT - Log;
 }
@@ -274,12 +296,15 @@ int CWorkRecvMessage::MessageSearchContentResponsePath(char *Log)
 		return LogPT - Log;
 	}
 
+	// Insert into cache table.
+	if(Sim->CacheMode == MODE_CACHE_ON) DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->FromPeerID);
+
 	// Get a next backward peer ID.
 	LastPeerID = Message->FloodPath.GetTail();
 
 	CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, LastPeerID);
 	WorkSendMessage->Message = new CMessage(DstPeerInfo->GetNewMessageID());
-	WorkSendMessage->Message->SetSearchContentResponsePath(Message->FromPeerID, Message->ContentID, &Message->FloodPath, DstPeerInfo->PeerID);
+	WorkSendMessage->Message->SetSearchContentResponsePath(Message->FromPeerID, Message->ContentID, &Message->FloodPath, DstPeerInfo->PeerID, Message->ResponseFrom);
 	Sim->InsertWork(Sim->Step, WorkSendMessage, true);
 
 	return LogPT - Log;

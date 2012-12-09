@@ -55,6 +55,8 @@ void CWorkSearchContent::Simulate(char *Log)
 
 	LogPT+= sprintf(LogPT, " (PeerID = %u, ContentID = %08X, NeighborPeerIDs =", PeerID, ContentID);
 
+	PeerInfo->MinumumSearchContentHops = -1;
+
 	// Send the search messages to neighbors.
 	CWorkQueue WorkQueue;
 	POSITION pos = PeerInfo->NeighborPeerIDMap.GetStartPosition();

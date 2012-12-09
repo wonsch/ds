@@ -18,6 +18,16 @@ CPeerInfo::~CPeerInfo()
 		PeerIDMessageIDMap.GetNextAssoc(pos, PeerID, MessageIDMap);
 		delete MessageIDMap;
 	}
+
+	// Delete all ContentIDPeerIDs.
+	pos = ContentIDPeerID.GetStartPosition();
+	while(pos != NULL)
+	{
+		unsigned int ContentID;
+		CAtlList<unsigned int> *PeerIDList;
+		ContentIDPeerID.GetNextAssoc(pos, ContentID, PeerIDList);
+		delete PeerIDList;
+	}
 }
 
 bool CPeerInfo::IsNeighborPeer(unsigned int PeerID)
@@ -55,6 +65,26 @@ bool CPeerInfo::TryInsertPeerIDMessageID(unsigned int PeerID, unsigned MessageID
 		MessageIDMap->SetAt(MessageID, NULL);
 		return true;
 	}
+}
+
+CAtlList<unsigned int> *CPeerInfo::FindContentIDPeerIDList(unsigned int ContentID)
+{
+	// Find a peer which has the content from cache table.
+	CAtlList<unsigned int> *PeerIDList;
+	if(ContentIDPeerID.Lookup(ContentID, PeerIDList) == false) return NULL;
+	else return PeerIDList;
+}
+
+void CPeerInfo::InsertContentIDPeerID(unsigned int ContentID, unsigned int PeerID)
+{
+	// Insert a peer which has the content into cache table.
+	CAtlList<unsigned int> *PeerIDList;
+	if(ContentIDPeerID.Lookup(ContentID, PeerIDList) == NULL)
+	{
+		PeerIDList = new CAtlList<unsigned int>();
+		ContentIDPeerID.SetAt(ContentID, PeerIDList);
+	}
+	PeerIDList->AddTail(PeerID);
 }
 
 int CPeerInfo::GerProperties(char *String)

@@ -57,20 +57,23 @@ void CMessage::SetSearchContent(unsigned int FromPeerID, unsigned int ContentID,
 	FloodPath.AddTail(PeerIDToInsertFloodPath);
 }
 
-void CMessage::SetSearchContentResponseSource(unsigned int FromPeerID, unsigned int ContentID)
+void CMessage::SetSearchContentResponseSource(unsigned int FromPeerID, unsigned int ContentID, unsigned int Hops, EResponseFrom ResponseFrom)
 {
 	Message = EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE;
 
 	this->FromPeerID = FromPeerID;
 	this->ContentID = ContentID;
+	this->ResponseFrom = ResponseFrom;
+	this->Hops = Hops;
 }
 
-void CMessage::SetSearchContentResponsePath(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToDeleteFloodPath)
+void CMessage::SetSearchContentResponsePath(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToDeleteFloodPath, EResponseFrom ResponseFrom)
 {
 	Message = EMESSAGE_SEARCH_CONTENT_RESPONSE_PATH;
 
 	this->FromPeerID = FromPeerID;
 	this->ContentID = ContentID;
+	this->ResponseFrom = ResponseFrom;
 
 	FloodPath.RemoveAll();
 	if(PrevFloodPath != NULL) FloodPath.AddTailList(PrevFloodPath);

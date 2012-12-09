@@ -9,6 +9,7 @@
 CSimulator::CSimulator(unsigned long RandomSeed)
 {
 	Verbose = true;
+	DumpFile = NULL;
 
 	Reset(RandomSeed);
 }
@@ -18,20 +19,25 @@ CSimulator::~CSimulator()
 	// Free all allocated memory
 	DeleteAllData();
 }
+
 /*=====================JIN=======================*/
 void CSimulator::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
 {
 	GroupMaxNumber = MaxNumber;
 }
+/*=====================JIN=======================*/
 
-void CSimulator::SetMode( int m)
+void CSimulator::SetMode(ECacheMode CacheMode, EGroupMode GroupMode)
 {
-	mode = m;
+	this->CacheMode = CacheMode;
+	this->GroupMode = GroupMode;
 }
 
-/*=====================JIN=======================*/
 void CSimulator::Reset(unsigned long RandomSeed)
 {
+	CacheMode = MODE_CACHE_OFF;
+	GroupMode = MODE_GROUPING_OFF;
+
 	Log = "";
 
 	Step = 0;
@@ -60,7 +66,7 @@ void CSimulator::SetEnvironmentDefault()
 	IsRandomEnrivonment = false;
 	InitNeighborPeerCount = 1;
 	InitContentCount = 5;
-	InitMaxFloodHopCount = 5;
+	InitMaxFloodHopCount = SIM_MAX_FLOOD_HOP_COUNT;
 }
 
 void CSimulator::SetEnvironmentRandomly()
@@ -68,7 +74,7 @@ void CSimulator::SetEnvironmentRandomly()
 	IsRandomEnrivonment = true;
 	InitNeighborPeerCount = SIM_RANDOM_VALUE;
 	InitContentCount = SIM_RANDOM_VALUE;
-	InitMaxFloodHopCount = 5;
+	InitMaxFloodHopCount = SIM_MAX_FLOOD_HOP_COUNT;
 }
 
 void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount, unsigned int InitMaxFloodHopCount)
@@ -105,6 +111,11 @@ void CSimulator::InsertWorkSearchContent(unsigned int StepNumber, unsigned int P
 	StatisticsTotalSearchContentCount++;
 
 	InsertWork(StepNumber, new CWorkSearchContent(this, PeerID, ContentID));
+}
+
+void CSimulator::DumpFinal()
+{
+
 }
 
 void CSimulator::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool AtHead)

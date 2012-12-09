@@ -2,17 +2,23 @@
 
 #define SIM_RANDOM_VALUE						-1
 #define SIM_RANDOM_NEIGHBOR_RANGE				3
+#define SIM_MAX_FLOOD_HOP_COUNT					5
 
 class CWorkQueue;
 class CWorkBase;
 class CPeerInfo;
 class CContentInfo;
 
-
-enum EMode
+enum ECacheMode
 {
-	NO_GROUPING = 0,
-	GROUPING,
+	MODE_CACHE_OFF = 0,
+	MODE_CACHE_ON,
+};
+
+enum EGroupMode
+{
+	MODE_GROUPING_OFF = 0,
+	MODE_GROUPING_ON,
 };
 
 class CSimulator
@@ -25,7 +31,8 @@ public:
 	~CSimulator();
 
 	void										SetVerbose(bool Verbose) {this->Verbose = Verbose;}
-	
+	void										SetMode(ECacheMode CacheMode, EGroupMode GroupMode);
+
 	void										Reset(unsigned long RandomSeed = 0);
 	void										SetEnvironmentDefault();
 	void										SetEnvironmentRandomly();
@@ -37,6 +44,8 @@ public:
 
 	void										InsertWorkInsertPeer(unsigned int StepNumber, unsigned int PeerCount);
 	void										InsertWorkSearchContent(unsigned int StepNumber, unsigned int PeerID = SIM_RANDOM_VALUE, unsigned int ContentID = SIM_RANDOM_VALUE);
+
+	void										DumpFinal();
 
 	////////////////////////////////////////////////////////////////
 	// For simulator
@@ -52,8 +61,8 @@ public:
 	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
 
 	unsigned int								GroupMaxNumber;
-	void										SetMode(int m);
-	int											mode;
+	ECacheMode									CacheMode;
+	EGroupMode									GroupMode;
 
 	/*   JIN    */
 
@@ -81,7 +90,6 @@ public:
 	unsigned int								InitContentCount;
 	unsigned int								InitMaxFloodHopCount;
 
-
 	////////////////////////////////////////////////////////////////
 	// Simulation data
 	////////////////////////////////////////////////////////////////
@@ -95,10 +103,10 @@ public:
 
 	CwRand										wRand;
 
-
 	unsigned int								StatisticsTotalSearchContentCount;
 	unsigned int								StatisticsTotalSearchContentSuccessCount;
 	unsigned int								StatisticsTotalSearchContentHopCount;
 	unsigned int								StatisticsTotalMessageCount;
 
+	FILE*										DumpFile;
 };
