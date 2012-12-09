@@ -358,7 +358,7 @@ bool CSimulator::SimulateOneStep()
 	delete WorkQueue;
 
 	// Dump this step info.
-	if(DumpFile != NULL && DumpNumber > 0)
+	if(DumpFile != NULL)
 	{
 		fprintf(DumpFile, "\n[CYCLE%u]\n", Step);
 		fprintf(DumpFile, "PEERNUM=%u\n", PeerInfoMap.GetCount());

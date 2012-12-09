@@ -4,8 +4,8 @@
 #include "ContentInfo.h"
 
 #define SIMULATOR_THREAD_COUNT					1
-#define PEER_COUNT								10000
-#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 1000)
+#define PEER_COUNT								100
+#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 100)
 
 CwLock PrintLock;
 
