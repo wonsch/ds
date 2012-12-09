@@ -89,7 +89,7 @@ void CWorkInsertPeer::Simulate(char *Log)
 	POSITION pos = PeerInfo->NeighborPeerIDMap.GetStartPosition();
 
 	//
-	if(Sim->mode == NO_GROUPING)
+	if(Sim->GroupMode == MODE_GROUPING_OFF)
 	{
 		while(pos != NULL)
 		{
@@ -109,7 +109,7 @@ void CWorkInsertPeer::Simulate(char *Log)
 	/*===================== jin ===============================*/
 	// Send Message-ASKGROUPING to neighbors instead of NOTIFICATION MSG
 
-	else if(Sim->mode == GROUPING)
+	else if(Sim->GroupMode == MODE_GROUPING_ON)
 	{
 		while(pos != NULL)
 		{

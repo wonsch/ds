@@ -14,6 +14,12 @@ enum EMessage
 	EMESSAGE_TRY_ASKING,
 };
 
+enum EResponseFrom
+{
+	ERESPONSE_FROM_SOURCE = 0,
+	ERESPONSE_FROM_CACHE,
+};
+
 class CMessage
 {
 public:
@@ -22,15 +28,17 @@ public:
 
 	void										SetNotifyNull();
 	void										SetSearchContent(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToInsertFloodPath);
-	void										SetSearchContentResponseSource(unsigned int FromPeerID, unsigned int ContentID);
-	void										SetSearchContentResponsePath(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToDeleteFloodPath);
+	void										SetSearchContentResponseSource(unsigned int FromPeerID, unsigned int ContentID, unsigned int Hops, EResponseFrom ResponseFrom);
+	void										SetSearchContentResponsePath(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToDeleteFloodPath, EResponseFrom ResponseFrom);
 
 	EMessage									Message;
 
 	unsigned int								MessageID;
 	unsigned int								FromPeerID;
 	unsigned int								ContentID;
+	EResponseFrom								ResponseFrom;
 
+	unsigned int								Hops;
 	CAtlList<unsigned int>						FloodPath;
 
 	/*========================JIN==================================*/
@@ -41,7 +49,7 @@ public:
 	void										SetTryAsking();
 	unsigned int								GroupID; 
 	unsigned int								GroupMemberNumber;
-	CAtlList<unsigned int>				GroupMemberID;
+	CAtlList<unsigned int>						GroupMemberID;
 
 	/*========================JIN==================================*/
 

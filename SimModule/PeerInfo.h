@@ -15,6 +15,9 @@ public:
 
 	bool										TryInsertPeerIDMessageID(unsigned int PeerID, unsigned MessageID);
 
+	CAtlList<unsigned int>*						FindContentIDPeerIDList(unsigned int ContentID);
+	void										InsertContentIDPeerID(unsigned int ContentID, unsigned int PeerID);
+
 	unsigned int								GetNewMessageID() {return ++NewMessageID;}
 
 	int											GerProperties(char *String);
@@ -24,8 +27,11 @@ public:
 	CAtlMap<unsigned int, void*>				NeighborPeerIDMap; // Map<PeerID, NULL>
 	CAtlMap<unsigned int, CContentInfo*>		ContentInfoMap; // Map<ContentID, ContentInfo>
 	CAtlMap<unsigned int, CAtlMap<unsigned int, void*>*> PeerIDMessageIDMap; // Map<PeerID, Map<MessageID, NULL>>
+	CAtlMap<unsigned int, CAtlList<unsigned int>*> ContentIDPeerID; // Map<ContentID, Map<PeerID, NULL>>
 
 	unsigned int								NewMessageID;
+
+	unsigned int								MinumumSearchContentHops;
 
 	/* JIN */
 	unsigned int groupID;
@@ -33,16 +39,10 @@ public:
 
 	CAtlMap<unsigned int, void*> GroupPeerIDMap; // group peer id
 	CAtlMap<unsigned int, void*> OtherGroupPeerIDMap; // other group peer id
-	CAtlMap<unsigned int, CAtlMap<unsigned int, CContentInfo*>*> ContentLocationInfo;  //the info of neighbor content
 	
 
 											 
 	//if there is no same contnetID of the neighborPeerID, insert the info 
 	bool										InserNeighborContentID(unsigned int NeighborPeerID, unsigned int ContentID); 
-	
-	
-
-
-
 	/* JIN */
 };

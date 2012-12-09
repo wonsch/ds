@@ -1,43 +1,66 @@
 #include "stdafx.h"
 #include "Simulator.h"
 #include "PeerInfo.h"
+#include "ContentInfo.h"
+
 #define SIMULATOR_THREAD_COUNT					1
 #define PEER_COUNT								10
 #define SEARCH_CONTENT_COUNT					5
 
-CwLock PrintLock;
 
+
+CwLock PrintLock;
+/*
 DWORD WINAPI SimulatorThread(LPVOID Argument)
 {
-
 	int ThreadID = (int)Argument;
+
 	CSimulator Sim;
 	Sim.SetVerbose(true);
 
 	//while(true)
 	{
-		Sim.Reset(GetTickCount());
+		system("cls");
+
+		//Sim.Reset(GetTickCount());
+		Sim.Reset(0);
 		
 		Sim.SetEnvironmentRandomly();
-		Sim.SetGroupMaxMemeberNumber(5); //jin
-		Sim.SetMode(GROUPING); //jin
 
+		Sim.SetGroupMaxMemeberNumber(5); //jin
+
+
+		Sim.SetMode(ThreadID == 1 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_OFF); //jin
+
+
+		// Insert peers
 		Sim.InsertWorkInsertPeer(1, PEER_COUNT);
-		for(int j = 0;j < SEARCH_CONTENT_COUNT;j++) Sim.InsertWorkSearchContent(3);
-		Sim.SimulateToInfinity();
+		Sim.SimulateTo(2);
+
+		// Search a content
+		CContentInfo *ContentInfo = Sim.GetRandomContent();
+		for(int j = 0;j < 10;j++)
+		{
+			Sim.InsertWorkSearchContent(Sim.Step + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
+			Sim.SimulateToInfinity();
+		}
 
 		// Result Print
 		{
 			CwLockAuto PrintLockAuto(&PrintLock);
 
+<<<<<<< HEAD
 		//	system("cls");
 
+=======
+>>>>>>> 3a03ca2caaaabcdfeb9f5e9815b6abd9e684e9a6
 			printf("================================ Thread %u ================================\n", ThreadID);
 			printf("*** Simulation is terminated at step %u\n", Sim.Step);
 			printf("*** Simulation Statistics\n");
 			printf("%s", Sim.GetStatistics());
 
 			printf("*** Simulation Output\n");
+<<<<<<< HEAD
 			printf("%s\n", Sim.GetLog());
 
 
@@ -85,17 +108,23 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		printf(" \n");
 		
 		
+=======
+			//printf("%s\n", Sim.GetLog());
+		}
+
+		Sleep(1000);
+>>>>>>> 3a03ca2caaaabcdfeb9f5e9815b6abd9e684e9a6
 	}
 
 	return 0;
 }
-
+*/
 int main()
 {
 	// Create simulator threads
 	for(int i = 0;i < SIMULATOR_THREAD_COUNT;i++)
 	{
-		CreateThread(NULL, 0, SimulatorThread, (LPVOID)(i + 1), 0, NULL);
+//		CreateThread(NULL, 0, SimulatorThread, (LPVOID)(i + 1), 0, NULL);
 	}
 
 	while(true) Sleep(1000);
