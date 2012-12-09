@@ -129,7 +129,7 @@ int CWorkRecvMessage::MessageNotifyGrouping(char *Log, char *Dump)
 		this->DstPeerInfo->GroupPeerIDMap.GetNext(pos);
 	}
 	this->DstPeerInfo->currGroupMemberNumber = count;
-	printf("\n===================NOTI ========================\n   src : %u , dst : %u \n===================NOTI ========================\n",this->SrcPeerID, this->DstPeerID);
+	//printf("\n===================NOTI ========================\n   src : %u , dst : %u \n===================NOTI ========================\n",this->SrcPeerID, this->DstPeerID);
 
 	return LogPT - Log;
 }
@@ -198,8 +198,8 @@ int CWorkRecvMessage::MessageAskGrouping(char *Log, char *Dump)
 		groupList.AddTail(DstPeerInfo->PeerID);
 
 		POSITION pos = DstPeerInfo->GroupPeerIDMap.GetStartPosition();
-printf("\n================HAVE GROUP MEMBER ID ==================\n");
-printf(" src id : %u , dst id : %u \n",this->SrcPeerID, this->DstPeerID);
+//printf("\n================HAVE GROUP MEMBER ID ==================\n");
+//printf(" src id : %u , dst id : %u \n",this->SrcPeerID, this->DstPeerID);
 		while(pos != NULL)
 		{
 			unsigned int GroupPeerID;
@@ -207,10 +207,10 @@ printf(" src id : %u , dst id : %u \n",this->SrcPeerID, this->DstPeerID);
 			DstPeerInfo->GroupPeerIDMap.GetNextAssoc(pos,GroupPeerID,Temp);
 			groupList.AddTail(GroupPeerID);
 			LogPT+= sprintf(LogPT, " %u", GroupPeerID);
-			printf("  group id : % u \n",GroupPeerID);
+		//	printf("  group id : % u \n",GroupPeerID);
 			
 		}
-		printf("\n================HAVE GROUP MEMBER ID ==================\n");  
+		//printf("\n================HAVE GROUP MEMBER ID ==================\n");  
 		DstPeerInfo->GroupPeerIDMap.SetAt(this->SrcPeerID,NULL);  //my그룹에 넣기
 		DstPeerInfo->currGroupMemberNumber += 1;
 

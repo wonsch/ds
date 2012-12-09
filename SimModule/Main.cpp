@@ -4,9 +4,9 @@
 #include "ContentInfo.h"
 
 #define SIMULATOR_THREAD_COUNT					1
-#define PEER_COUNT								100
-#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 100)
-
+#define PEER_COUNT								1000
+//#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 1000)
+#define SEARCH_CONTENT_COUNT					10
 CwLock PrintLock;
 
 DWORD WINAPI SimulatorThread(LPVOID Argument)
@@ -26,7 +26,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			
 			Sim.SetEnvironmentRandomly();
 			Sim.SetGroupMaxMemeberNumber(5); //jin
-			Sim.SetMode(i == 0 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_OFF); //jin
+			Sim.SetMode(i == 0 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_ON); //jin
 			//Sim.DumpOpen();
 
 			// Insert peers

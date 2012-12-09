@@ -247,6 +247,7 @@ CAtlString CSimulator::GetStatistics()
 	}
 
 	CAtlString String;
+	String.AppendFormat("RandomSeed : %u\n", InitRandomSeed);
 	String.AppendFormat("Total Peers : %u\n", PeerInfoMap.GetCount());
 	//String.AppendFormat("Total Contents : %u\n", ContentInfoMap.GetCount());
 	String.AppendFormat("Average Number of Contents per Peer : %g\n", (double)ContentInfoMap.GetCount() / PeerInfoMap.GetCount());
