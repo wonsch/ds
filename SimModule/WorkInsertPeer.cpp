@@ -13,7 +13,7 @@ CWorkInsertPeer::~CWorkInsertPeer()
 {
 }
 
-void CWorkInsertPeer::Simulate(char *Log)
+void CWorkInsertPeer::Simulate(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 	LogPT+= sprintf(LogPT, "    Insert a Peer. ");
@@ -133,4 +133,11 @@ void CWorkInsertPeer::Simulate(char *Log)
 
 	LogPT+= PeerInfo->GerProperties(LogPT);
 	LogPT+= sprintf(LogPT, "\n");
+
+	// Dump
+	Dump+= sprintf(Dump, "ETYPE=INSERT_PEER\n");
+	//Dump+= sprintf(Dump, "EDETAIL=\n");
+	Dump+= sprintf(Dump, "EACTOR=%u\n", PeerInfo->PeerID);
+	//Dump+= sprintf(Dump, "ETARGET=\n");
+	Dump+= sprintf(Dump, "ENOTE=Peer %u is inserted.\n", PeerInfo->PeerID);
 }

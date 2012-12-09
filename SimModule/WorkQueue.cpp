@@ -3,7 +3,7 @@
 
 CWorkQueue::CWorkQueue()
 {
-	InNumber = ExNumber = 0;
+	Number = 0;
 	WorkTail = &WorkHead;
 }
 
@@ -57,16 +57,14 @@ void CWorkQueue::QueueAtTail(CWorkBase *Work)
 	WorkTail = WorkTail->NextLink;
 }
 
-bool CWorkQueue::DeQueue(CWorkBase **Work, unsigned int *InNumber, unsigned int *ExNumber)
+bool CWorkQueue::DeQueue(CWorkBase **Work, unsigned int *Number)
 {
 	if(IsEmpty() == true) return false;
 
-	this->InNumber++;
-	if(WorkHead.NextLink->DontIncreaseWorkNumber == false) this->ExNumber++;
+	if(WorkHead.NextLink->DontIncreaseWorkNumber == false) this->Number++;
 
 	if(Work != NULL) *Work = WorkHead.NextLink;
-	if(InNumber != NULL) *InNumber = this->InNumber;
-	if(ExNumber != NULL) *ExNumber = this->ExNumber;
+	if(Number != NULL) *Number = this->Number;
 
 	if(WorkTail == WorkHead.NextLink) WorkTail = &WorkHead;
 	WorkHead.NextLink = WorkHead.NextLink->NextLink;

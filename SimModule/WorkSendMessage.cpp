@@ -13,7 +13,7 @@ CWorkSendMessage::~CWorkSendMessage()
 {
 }
 
-void CWorkSendMessage::Simulate(char *Log)
+void CWorkSendMessage::Simulate(char *Log, char *Dump)
 {
 	assert(Message != NULL);
 
@@ -30,46 +30,77 @@ void CWorkSendMessage::Simulate(char *Log)
 		// Notify NULL
 		{
 			LogPT+= sprintf(LogPT, ", Message = NotifyNull");
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=NOTIFY_NULL\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=Peer %u notify peer %u.\n", SrcPeerID, DstPeerID);
 		}
 		break;
 
 	case EMESSAGE_SEARCH_CONTENT:
 		// Search a content
 		{
+			char *DumpLogPT = LogPT;
 			LogPT+= sprintf(LogPT, ", Message = SearchContent, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
 			for(POSITION pos = Message->FloodPath.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->FloodPath.GetNext(pos));
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=SEARCH_CONTENT\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=%s\n", DumpLogPT + 2);
 		}
 		break;
 
 	case EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE:
 		// Response a searching content message to source.
 		{
+			char *DumpLogPT = LogPT;
 			LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X, Hops = %u", Message->FromPeerID, Message->ContentID, Message->Hops);
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=SEARCH_CONTENT_RESPONSE_SOURCE\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=%s\n", DumpLogPT + 2);
 		}
 		break;
 
 	case EMESSAGE_SEARCH_CONTENT_RESPONSE_PATH:
 		// Response a searching content message to peers which is on the flood path.
 		{
+			char *DumpLogPT = LogPT;
 			LogPT+= sprintf(LogPT, ", Message = SearchContentResponsePath, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
 			for(POSITION pos = Message->FloodPath.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->FloodPath.GetNext(pos));
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=SEARCH_CONTENT_RESPONSE_PATH\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=%s\n", DumpLogPT + 2);
 		}
 		break;
+
 	case EMESSAGE_ASK_GROUPING:
 		{
-
-			LogPT+= sprintf(LogPT, ", Message = EMESSAGE_ASK_GROUPING, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
+			LogPT+= sprintf(LogPT, ", Message = EMESSAGE_ASK_GROUPING");
 		}
 		break;
 
 	case EMESSAGE_REJECT_GROUPING:
 		{
-			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_REJECT_GROUPING, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
+			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_REJECT_GROUPING");
 		}
 		break;
 	case EMESSAGE_ACCEPT_GROUPING:
 		{
-			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_ACCEPT_GROUPING, FromPeerID = %u, ContentID = %08X, FloodPath =", Message->FromPeerID, Message->ContentID);
+			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_ACCEPT_GROUPING, FloodPath =");
 			for(POSITION pos = Message->GroupMemberID.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->GroupMemberID.GetNext(pos));
 		}
 		break;

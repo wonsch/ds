@@ -8,5 +8,5 @@ public:
 	CWorkSendMessage(CSimulator *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID);
 	~CWorkSendMessage();
 
-	virtual	void								Simulate(char *Log);
+	virtual	void								Simulate(char *Log, char *Dump);
 };
