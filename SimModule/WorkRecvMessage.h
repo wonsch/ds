@@ -25,6 +25,7 @@ private:
 	int											MessageAcceptGrouping(char* Log);
 	int											MessageNotifyGrouping(char* Log);
 	int											MessageTryAsking(char* Log);
+	int											MessageUpdateContentInfo(char* Log);
 	/*Jin*/
 	
 };

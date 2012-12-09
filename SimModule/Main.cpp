@@ -5,7 +5,7 @@
 
 #define SIMULATOR_THREAD_COUNT					2
 #define PEER_COUNT								100
-#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 100)
+#define SEARCH_CONTENT_COUNT					(10)
 
 CwLock PrintLock;
 
@@ -16,7 +16,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 	CSimulator Sim;
 	Sim.SetVerbose(false);
 
-	//while(true)
+	while(true)
 	{
 		system("cls");
 
@@ -25,7 +25,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		
 		Sim.SetEnvironmentRandomly();
 		Sim.SetGroupMaxMemeberNumber(5); //jin
-		Sim.SetMode(ThreadID == 1 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_OFF); //jin
+		Sim.SetMode(ThreadID == 1 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_ON); //jin
 		Sim.DumpOpen();
 
 		// Insert peers
@@ -54,7 +54,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 
 
 			// jin
-			/*printf("================================ PEER GROUP INFO  ================================\n");
+		/*	printf("================================ PEER GROUP INFO  ================================\n");
 
 			POSITION pos = 	Sim.PeerInfoMap.GetStartPosition();
 			while(pos != NULL)
@@ -98,7 +98,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		// Final Dump
 		Sim.DumpFinal();
 
-		Sleep(1000);
+		Sleep(5000);
 	}
 
 	return 0;

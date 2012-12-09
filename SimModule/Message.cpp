@@ -18,6 +18,12 @@ void CMessage::SetNotifyNull()
 	Message = EMESSAGE_NOTIFY_NULL;
 }
 /*========================JIN==================================*/
+void CMessage::SetContentInfoUpdate(unsigned int PeerID, unsigned contentID)
+{
+	Message = EMESSAGE_CONTENT_INFO_UPDATE;
+	this->ContentID = contentID;
+	this->ContentPeerID = PeerID;
+}
 void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int> *pGroupMemberID)
 {
 	Message = EMESSAGE_ACCEPT_GROUPING;
