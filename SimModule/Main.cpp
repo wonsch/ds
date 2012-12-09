@@ -5,7 +5,7 @@
 
 #define SIMULATOR_THREAD_COUNT					2
 #define PEER_COUNT								100
-#define SEARCH_COUNT_COUNT						(PEER_COUNT / 100)
+#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 100)
 
 CwLock PrintLock;
 
@@ -24,7 +24,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		Sim.Reset(0);
 		
 		Sim.SetEnvironmentRandomly();
-		Sim.SetGroupMaxMemeberNumber(3); //jin
+		Sim.SetGroupMaxMemeberNumber(5); //jin
 		Sim.SetMode(ThreadID == 1 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_OFF); //jin
 		Sim.DumpOpen();
 
@@ -34,7 +34,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 
 		// Search a content
 		CContentInfo *ContentInfo = Sim.GetRandomContent();
-		for(int j = 0;j < SEARCH_COUNT_COUNT;j++)
+		for(int j = 0;j < SEARCH_CONTENT_COUNT;j++)
 		{
 			Sim.InsertWorkSearchContent(Sim.Step + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
 			Sim.SimulateToInfinity();
@@ -51,6 +51,48 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 
 			printf("*** Simulation Output\n");
 			//printf("%s\n", Sim.GetLog());
+
+
+			// jin
+			/*printf("================================ PEER GROUP INFO  ================================\n");
+
+			POSITION pos = 	Sim.PeerInfoMap.GetStartPosition();
+			while(pos != NULL)
+			{
+				unsigned int PeerID;
+				CPeerInfo *PeerInfo;
+				Sim.PeerInfoMap.GetNextAssoc(pos, PeerID, PeerInfo);
+				printf("PeerID : %u , GroupID : %u , curr : %u   group_member :",PeerInfo->PeerID, PeerInfo->groupID, PeerInfo->currGroupMemberNumber	);
+				POSITION pos2 = PeerInfo->GroupPeerIDMap.GetStartPosition();
+				while(pos2 !=NULL)
+				{
+					unsigned int groupID;
+					void* temp;
+					PeerInfo->GroupPeerIDMap.GetNextAssoc(pos2, groupID, temp);
+					printf("  %u,   ", groupID);
+				}
+				printf("\n   NEIGHBOR ");
+
+				pos2 = PeerInfo->NeighborPeerIDMap.GetStartPosition();
+				while(pos2 !=NULL)
+				{
+					unsigned int groupID;
+					void* temp;
+					PeerInfo->NeighborPeerIDMap.GetNextAssoc(pos2, groupID, temp);
+					printf("  %u,   ", groupID);
+				}
+				printf("   othergroup ");
+				pos2 =PeerInfo->OtherGroupPeerIDMap.GetStartPosition();
+				while(pos2 !=NULL)
+				{
+					unsigned int groupID;
+					void* temp;
+					PeerInfo->OtherGroupPeerIDMap.GetNextAssoc(pos2, groupID, temp);
+					printf("  %u,   ", groupID);
+				}
+
+				printf(" \n");
+			}*/
 		}
 
 		// Final Dump

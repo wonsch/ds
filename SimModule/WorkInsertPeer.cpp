@@ -22,8 +22,8 @@ void CWorkInsertPeer::Simulate(char *Log)
 	CPeerInfo *PeerInfo = new CPeerInfo(++Sim->NewPeerID);
 	
 	/*JIN*/
-	PeerInfo->currGroupMemberNumber = 1;
-	PeerInfo->groupID = -1;
+//	PeerInfo->currGroupMemberNumber = 1;
+//	PeerInfo->groupID = 0;
 	/*JIN*/
 
 	// Set neighbor peers.

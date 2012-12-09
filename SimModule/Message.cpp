@@ -6,6 +6,7 @@ CMessage::CMessage(unsigned int MessageID)
 	Message = EMESSAGE_EMPTY;
 
 	this->MessageID = MessageID;
+
 }
 
 CMessage::~CMessage()
@@ -29,6 +30,10 @@ void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberN
 		GroupMemberID.AddTailList(pGroupMemberID);
 
 }
+void CMessage::SetNotifyGrouping()
+{
+	Message = EMESSAGE_NOTIFY_GROUPING;
+}
 
 void CMessage::SetAskGrouping()
 {
@@ -41,10 +46,11 @@ void CMessage::SetAskGroupReject()
 }
 
 /*========================JIN==================================*/
-void CMessage::SetNotifyGrouping()
+void CMessage::SetTryAsking()
 {
-	Message = EMESSAGE_NOTIFY_GROUPING;
+	Message = EMESSAGE_TRY_ASKING;
 }
+
 void CMessage::SetSearchContent(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToInsertFloodPath)
 {
 	Message = EMESSAGE_SEARCH_CONTENT;

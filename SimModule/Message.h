@@ -11,6 +11,7 @@ enum EMessage
 	EMESSAGE_REJECT_GROUPING,
 	EMESSAGE_ACCEPT_GROUPING,
 	EMESSAGE_NOTIFY_GROUPING,
+	EMESSAGE_TRY_ASKING,
 };
 
 enum EResponseFrom
@@ -45,7 +46,8 @@ public:
 	void										SetNotifyGrouping();
 	void										SetAskGrouping();
 	void										SetAskGroupReject();
-	unsigned int								GroupID;
+	void										SetTryAsking();
+	unsigned int								GroupID; 
 	unsigned int								GroupMemberNumber;
 	CAtlList<unsigned int>						GroupMemberID;
 

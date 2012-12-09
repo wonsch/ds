@@ -5,6 +5,8 @@ CPeerInfo::CPeerInfo(unsigned int PeerID)
 {
 	this->PeerID = PeerID;
 	NewMessageID = 0;
+	groupID = 0;
+	currGroupMemberNumber = 1;
 }
 
 CPeerInfo::~CPeerInfo()
