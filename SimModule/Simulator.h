@@ -45,7 +45,9 @@ public:
 	void										InsertWorkInsertPeer(unsigned int StepNumber, unsigned int PeerCount);
 	void										InsertWorkSearchContent(unsigned int StepNumber, unsigned int PeerID = SIM_RANDOM_VALUE, unsigned int ContentID = SIM_RANDOM_VALUE);
 
+	void										DumpOpen();
 	void										DumpFinal();
+	void										DumpPeers();
 
 	////////////////////////////////////////////////////////////////
 	// For simulator
@@ -101,6 +103,7 @@ public:
 
 	CAtlMap<unsigned int, CContentInfo*>		ContentInfoMap; // Map<ContentID, ContentInfo>
 
+	unsigned int								InitRandomSeed;
 	CwRand										wRand;
 
 	unsigned int								StatisticsTotalSearchContentCount;

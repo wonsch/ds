@@ -15,10 +15,11 @@ public:
 	void										QueueAtHead(CWorkBase *Work);
 	void										QueueAtTail(CWorkQueue *Work);
 	void										QueueAtTail(CWorkBase *Work);
-	bool										DeQueue(CWorkBase **Work, unsigned int *Number);
+	bool										DeQueue(CWorkBase **Work, unsigned int *InNumber, unsigned int *ExNumber);
 
 private:
-	unsigned int								Number;
+	unsigned int								InNumber;
+	unsigned int								ExNumber;
 	CWorkBase									WorkHead;
 	CWorkBase*									WorkTail;
 };

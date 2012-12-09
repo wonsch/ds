@@ -16,6 +16,8 @@ CSimulator::CSimulator(unsigned long RandomSeed)
 
 CSimulator::~CSimulator()
 {
+	if(DumpFile != NULL) fclose(DumpFile);
+
 	// Free all allocated memory
 	DeleteAllData();
 }
@@ -44,6 +46,7 @@ void CSimulator::Reset(unsigned long RandomSeed)
 
 	NewPeerID = 0;
 	
+	InitRandomSeed = RandomSeed;
 	wRand.SetSeed(RandomSeed);
 
 	StatisticsTotalSearchContentCount = 0;
@@ -113,9 +116,54 @@ void CSimulator::InsertWorkSearchContent(unsigned int StepNumber, unsigned int P
 	InsertWork(StepNumber, new CWorkSearchContent(this, PeerID, ContentID));
 }
 
+void CSimulator::DumpOpen()
+{
+	// Open a dump file
+	if(DumpFile != NULL) fclose(DumpFile);
+	char FileName[MAX_PATH];
+	sprintf(FileName, "Sim_%08X_CACHE_%s_GROUP_%s.log", InitRandomSeed, CacheMode == MODE_CACHE_OFF ? "OFF" : "ON", GroupMode == MODE_GROUPING_OFF ? "OFF" : "ON");
+	DumpFile = fopen(FileName, "w");
+	assert(DumpFile != NULL);
+}
+
 void CSimulator::DumpFinal()
 {
+	if(DumpFile == NULL) return;
 
+	fprintf(DumpFile, "[SIMULATIONINFO]\n");
+	fprintf(DumpFile, "PEERCOUNT=%u\n", PeerInfoMap.GetCount());
+	fprintf(DumpFile, "CYCLECOUNT=%u\n", Step);
+}
+
+void CSimulator::DumpPeers()
+{
+	if(DumpFile == NULL) return;
+
+	unsigned int PeerCount = 0;
+	POSITION pos1 = PeerInfoMap.GetStartPosition();
+	while(pos1 != NULL)
+	{
+		unsigned int PeerID;
+		CPeerInfo *PeerInfo;
+		PeerInfoMap.GetNextAssoc(pos1, PeerID, PeerInfo);
+
+		fprintf(DumpFile, "[CYCLE%u.PEER%u]\n", Step, ++PeerCount);
+		fprintf(DumpFile, "PID=%u\n", PeerID);
+		fprintf(DumpFile, "NEIGHBOR=");
+
+		bool IsFirst = true;
+		POSITION pos2 = PeerInfo->NeighborPeerIDMap.GetStartPosition();
+		while(pos2 != NULL)
+		{
+			unsigned int PeerID;
+			void *Temp;
+			PeerInfo->NeighborPeerIDMap.GetNextAssoc(pos2, PeerID, Temp);
+
+			fprintf(DumpFile, "%s%u", IsFirst ? "" : "|", PeerID);
+			if(IsFirst == true) IsFirst = false;
+		}
+		if(IsFirst == false) fprintf(DumpFile, "\n");
+	}
 }
 
 void CSimulator::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool AtHead)
@@ -280,25 +328,39 @@ bool CSimulator::SimulateOneStep()
 
 	// Get works from the WorkQueue and simulate each work.
 	CWorkBase *Work;
-	unsigned int PrevNumber = 0, NextNumber;
-	while(WorkQueue->DeQueue(&Work, &NextNumber) == true)
+	unsigned int PrevNumber = 0, InNextNumber, ExNextNumber;
+	while(WorkQueue->DeQueue(&Work, &InNextNumber, &ExNextNumber) == true)
 	{
+		// Write a dump for this step
+		if(DumpFile != NULL) fprintf(DumpFile, "[CYCLE%u.EVENT%u]\n", Step, InNextNumber);
+
 		// Simulate a work.
 		char Log[4096];
 		Work->Simulate(Log);
 		if(Verbose == true)
 		{
-			if(PrevNumber != NextNumber) printf("- Work %u>\n", NextNumber);
+			if(PrevNumber != ExNextNumber) printf("- Work %u>\n", ExNextNumber);
 			printf("%s", Log);
 		}
 		delete Work;
-		PrevNumber = NextNumber;
+		PrevNumber = ExNextNumber;
 
 		// Change the environment.
 		if(IsRandomEnrivonment == true) SetEnvironmentRandomly();
 	}
 	WorkQueueMap.RemoveKey(Step);
 	delete WorkQueue;
+
+	// Dump this step info.
+	if(DumpFile != NULL)
+	{
+		fprintf(DumpFile, "[CYCLE%u]\n", Step);
+		fprintf(DumpFile, "PEERNUM=%u\n", PeerInfoMap.GetCount());
+		fprintf(DumpFile, "EVENTNUM=%u\n", ExNextNumber);
+
+		// Dump peers info.
+		DumpPeers();
+	}
 
 End:
 	if(Verbose == true) printf("\n");

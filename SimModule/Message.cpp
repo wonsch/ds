@@ -19,7 +19,7 @@ void CMessage::SetNotifyNull()
 /*========================JIN==================================*/
 void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int> *pGroupMemberID)
 {
-	Message = EMSSAGE_ACCEPT_GROUPING;
+	Message = EMESSAGE_ACCEPT_GROUPING;
 	
 	this->GroupID = GroupID;
 	this->GroupMemberNumber = GroupMemberNumber;
@@ -37,7 +37,7 @@ void CMessage::SetAskGrouping()
 
 void CMessage::SetAskGroupReject()
 {
-	Message = EMSSAGE_REJECT_GROUPING;
+	Message = EMESSAGE_REJECT_GROUPING;
 }
 
 /*========================JIN==================================*/

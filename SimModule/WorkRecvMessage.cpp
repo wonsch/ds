@@ -58,11 +58,11 @@ void CWorkRecvMessage::Simulate(char *Log)
 			// 3. 가능 o  curr_member++; accept_grouping msg 보내기 (group id, curr_num, curr_group_member_list)
 			// 4. 자기꺼에서 새로운 피어 그룹자료구조에 넣고, 네이버 자료구조에도 넣기 
 			break;
-		case EMSSAGE_REJECT_GROUPING:
+		case EMESSAGE_REJECT_GROUPING:
 			// 일단 자기 ID 로 그룹 생성
 			LogPT +=MessageRejectGrouping(LogPT);
 			break;
-		case EMSSAGE_ACCEPT_GROUPING:
+		case EMESSAGE_ACCEPT_GROUPING:
 			// 받은 정보로 자신의 그룹 정보를 갱신
 			LogPT += MessageAcceptGrouping(LogPT);
 			break;

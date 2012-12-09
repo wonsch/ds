@@ -4,7 +4,8 @@
 #include "ContentInfo.h"
 
 #define SIMULATOR_THREAD_COUNT					2
-#define PEER_COUNT								10000
+#define PEER_COUNT								100
+#define SEARCH_COUNT_COUNT						(PEER_COUNT / 100)
 
 CwLock PrintLock;
 
@@ -25,6 +26,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		Sim.SetEnvironmentRandomly();
 		Sim.SetGroupMaxMemeberNumber(3); //jin
 		Sim.SetMode(ThreadID == 1 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_OFF); //jin
+		Sim.DumpOpen();
 
 		// Insert peers
 		Sim.InsertWorkInsertPeer(1, PEER_COUNT);
@@ -32,7 +34,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 
 		// Search a content
 		CContentInfo *ContentInfo = Sim.GetRandomContent();
-		for(int j = 0;j < 10;j++)
+		for(int j = 0;j < SEARCH_COUNT_COUNT;j++)
 		{
 			Sim.InsertWorkSearchContent(Sim.Step + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
 			Sim.SimulateToInfinity();
@@ -50,6 +52,9 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			printf("*** Simulation Output\n");
 			//printf("%s\n", Sim.GetLog());
 		}
+
+		// Final Dump
+		Sim.DumpFinal();
 
 		Sleep(1000);
 	}
