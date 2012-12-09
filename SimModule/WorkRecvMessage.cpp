@@ -72,6 +72,10 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 		case EMESSAGE_TRY_ASKING:
 			LogPT += MessageTryAsking(LogPT, Dump);
 			break;
+		case EMESSAGE_CONTENT_INFO_UPDATE:
+			LogPT += MessageUpdateContentInfo(LogPT, Dump);
+			break;
+
 		}
 	}
 
@@ -79,63 +83,62 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 }
 
 /*====================jin=========================*/
+
+int CWorkRecvMessage::MessageUpdateContentInfo(char *Log, char *Dump)
+{
+	char* LogPT = Log;
+	LogPT+= sprintf(LogPT, ", Message = UpdateContentInfo");
+
+	this->DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->ContentPeerID);
+
+	return LogPT - Log;
+}
+
 int CWorkRecvMessage::MessageTryAsking(char *Log, char *Dump)
 {
 	char* LogPT = Log;
-	CWorkQueue WorkQueue;
-	POSITION pos = this->DstPeerInfo->NeighborPeerIDMap.GetStartPosition();
+	LogPT+= sprintf(LogPT, ", Message = TryAsking");
+
+	CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, this->DstPeerInfo->PeerID, SrcPeerID);
+	WorkSendMessage->DontIncreaseWorkNumber = true;
+	WorkSendMessage->Message = new CMessage(this->DstPeerInfo->GetNewMessageID());
+	WorkSendMessage->Message->SetAskGrouping();
 	
-	while(pos != NULL)
-	{
-		unsigned int NeighborPeerID;
-		void *Temp;
-		this->DstPeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
-		CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, this->DstPeerInfo->PeerID, NeighborPeerID);
-		WorkSendMessage->DontIncreaseWorkNumber = true;
-		WorkSendMessage->Message = new CMessage(this->DstPeerInfo->GetNewMessageID());
-		WorkSendMessage->Message->SetAskGrouping();
-		WorkQueue.QueueAtTail(WorkSendMessage);
-
-
-	}
-
-	
-	Sim->InsertWork(Sim->Step, &WorkQueue, true);
-	WorkQueue.RemoveAll();
+	Sim->InsertWork(Sim->Step, WorkSendMessage, true);
 
 	return LogPT - Log; 
-
 }
+
 int CWorkRecvMessage::MessageRejectGrouping(char *Log, char *Dump)
 {
 	char* LogPT = Log;
-		// 자기 정보 갱신 
+	LogPT+= sprintf(LogPT, ", Message = RejectGrouping");
+
+	// 자기 정보 갱신 
 	if ( this->DstPeerInfo->groupID == 0 )
 	{
 		this->DstPeerInfo->groupID = this->DstPeerInfo->PeerID;
-		LogPT+= sprintf(LogPT, " %u", this->DstPeerID);
+		LogPT+= sprintf(LogPT, ")\n    Make a temporary group. (GroupID = %u, GroupPeerIDs = %u", this->DstPeerID, this->DstPeerID);
 	}
 	return LogPT - Log;
 }
 int CWorkRecvMessage::MessageNotifyGrouping(char *Log, char *Dump)
 {
 	char* LogPT = Log;
-	unsigned int count = 1;
+
 	this->DstPeerInfo->GroupPeerIDMap.SetAt(this->SrcPeerID, NULL);
-	POSITION pos = this->DstPeerInfo->GroupPeerIDMap.GetStartPosition();
-	while(pos != NULL)
-	{
-		count++ ;
-		this->DstPeerInfo->GroupPeerIDMap.GetNext(pos);
-	}
-	this->DstPeerInfo->currGroupMemberNumber = count;
+	this->DstPeerInfo->currGroupMemberNumber = this->DstPeerInfo->GroupPeerIDMap.GetCount();
 	//printf("\n===================NOTI ========================\n   src : %u , dst : %u \n===================NOTI ========================\n",this->SrcPeerID, this->DstPeerID);
+
+	LogPT+= sprintf(LogPT, ", Message = NotifyGrouping, GroupID = %u, GroupCount = %u", DstPeerInfo->groupID, DstPeerInfo->currGroupMemberNumber);
 
 	return LogPT - Log;
 }
 int CWorkRecvMessage::MessageAcceptGrouping(char *Log, char *Dump)
 {
 	char *LogPT = Log;
+	LogPT+= sprintf(LogPT, ", Message = AcceptGrouping, GroupID = %u, GroupPeerIDs = %u", Message->GroupID, DstPeerID);
+
 	CWorkQueue WorkQueue;
 	CWorkSendMessage *WorkSendMessage;
 	if ( this->DstPeerInfo->groupID == 0 || this->DstPeerInfo->groupID == this->DstPeerInfo->PeerID )
@@ -150,7 +153,7 @@ int CWorkRecvMessage::MessageAcceptGrouping(char *Log, char *Dump)
 			this->DstPeerInfo->GroupPeerIDMap.SetAt(GroupPeerID, NULL);
 			this->DstPeerInfo->currGroupMemberNumber += 1;
 			
-			//if(SrcPeerID != GroupPeerID)
+			if(SrcPeerID != GroupPeerID)
 			{
 				WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, GroupPeerID);
 				WorkSendMessage->Message = new CMessage(DstPeerInfo->GetNewMessageID());
@@ -175,10 +178,13 @@ int CWorkRecvMessage::MessageAcceptGrouping(char *Log, char *Dump)
 int CWorkRecvMessage::MessageAskGrouping(char *Log, char *Dump)
 {
 	char *LogPT = Log;
+	LogPT+= sprintf(LogPT, ", Message = AskGrouping, GroupID = %u, GroupPeerIDs =", DstPeerInfo->groupID);
+
 	CWorkQueue WorkQueue;
 	CWorkSendMessage *WorkSendMessage;
 	WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, SrcPeerID);
 	WorkSendMessage->Message = new CMessage(DstPeerInfo->GetNewMessageID());
+	DstPeerInfo->InsertNeighborPeerID(SrcPeerID);
 	// 1. 내 그룹에 새로운 피어가 들어올수 있는지 확인 (max_num , curr_num 비교) 
 	
 	if(this->DstPeerInfo->groupID == 0) 
@@ -198,38 +204,42 @@ int CWorkRecvMessage::MessageAskGrouping(char *Log, char *Dump)
 		groupList.AddTail(DstPeerInfo->PeerID);
 
 		POSITION pos = DstPeerInfo->GroupPeerIDMap.GetStartPosition();
-//printf("\n================HAVE GROUP MEMBER ID ==================\n");
-//printf(" src id : %u , dst id : %u \n",this->SrcPeerID, this->DstPeerID);
+		//printf("\n================HAVE GROUP MEMBER ID ==================\n");
+		//printf(" src id : %u , dst id : %u \n",this->SrcPeerID, this->DstPeerID);
 		while(pos != NULL)
 		{
 			unsigned int GroupPeerID;
 			void *Temp;
 			DstPeerInfo->GroupPeerIDMap.GetNextAssoc(pos,GroupPeerID,Temp);
 			groupList.AddTail(GroupPeerID);
-			LogPT+= sprintf(LogPT, " %u", GroupPeerID);
-		//	printf("  group id : % u \n",GroupPeerID);
+			//printf("  group id : % u \n",GroupPeerID);
 			
 		}
 		//printf("\n================HAVE GROUP MEMBER ID ==================\n");  
-		DstPeerInfo->GroupPeerIDMap.SetAt(this->SrcPeerID,NULL);  //my그룹에 넣기
+		DstPeerInfo->GroupPeerIDMap.SetAt(this->SrcPeerID, NULL);  //my그룹에 넣기
 		DstPeerInfo->currGroupMemberNumber += 1;
 
-		WorkSendMessage->Message->SetAskGroupAccept(DstPeerInfo->groupID,DstPeerInfo->currGroupMemberNumber,&groupList);
+		WorkSendMessage->Message->SetAskGroupAccept(DstPeerInfo->groupID, DstPeerInfo->currGroupMemberNumber, &groupList);
 		WorkQueue.QueueAtTail(WorkSendMessage);
-
-
 	}
 	else
 	{
 		// 2. 가능 x  reject_grouping msg 보내기
 		WorkSendMessage->Message->SetAskGroupReject();  //other그룹에 넣기
 		WorkQueue.QueueAtTail(WorkSendMessage);
-
-		
-		
 	}
 
-	DstPeerInfo->NeighborPeerIDMap.SetAt(this->SrcPeerID,NULL); // total neighbor 그룹에 넣기
+	LogPT+= sprintf(LogPT, " %u", DstPeerInfo->PeerID);
+	POSITION pos = DstPeerInfo->GroupPeerIDMap.GetStartPosition();
+	while(pos != NULL)
+	{
+		unsigned int GroupPeerID;
+		void *Temp;
+		DstPeerInfo->GroupPeerIDMap.GetNextAssoc(pos, GroupPeerID, Temp);
+		LogPT+= sprintf(LogPT, " %u", GroupPeerID);
+	}
+
+	//DstPeerInfo->NeighborPeerIDMap.SetAt(this->SrcPeerID,NULL); // total neighbor 그룹에 넣기
 
 	Sim->InsertWork(Sim->Step, &WorkQueue, true);
 	WorkQueue.RemoveAll();
@@ -391,8 +401,52 @@ int CWorkRecvMessage::MessageSearchContentResponsePath(char *Log, char *Dump)
 	}
 
 	// Insert into cache table.
-	if(Sim->CacheMode == MODE_CACHE_ON) DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->FromPeerID);
+	if(Sim->CacheMode == MODE_CACHE_ON) 
+	{	
+		DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->FromPeerID);
+	// TODO (JIN): 다른 그룹의 노드에게 자신이 저장한 컨텐츠 location 정보를 전달 -> 그 노드는 저장하고 끝내기 
+	
+		CWorkQueue WorkQueue;
+		POSITION pos2 = DstPeerInfo->GroupPeerIDMap.GetStartPosition();
+		bool diff = true;
 
+		while(pos2 != NULL)
+		{
+			unsigned int GroupPeerID;
+			void *temp2;
+			DstPeerInfo->GroupPeerIDMap.GetNextAssoc(pos2, GroupPeerID, temp2);
+			POSITION pos = DstPeerInfo->NeighborPeerIDMap.GetStartPosition();
+			while(pos != NULL)
+			{
+				unsigned int NeighborPeerID;
+				void *Temp;
+				DstPeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
+				if(GroupPeerID == NeighborPeerID)
+				{
+					diff = false;
+				}
+
+			}
+			if(diff)
+			{
+				CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, GroupPeerID);
+				WorkSendMessage->Message = new CMessage(Message->MessageID);
+				WorkSendMessage->Message->SetContentInfoUpdate(Message->ContentID, Message->FromPeerID);
+				WorkQueue.QueueAtTail(WorkSendMessage);
+				LogPT+= sprintf(LogPT, " %u", GroupPeerID);
+
+
+			}
+			else
+			{
+				diff = true;
+			}
+		}
+		Sim->InsertWork(Sim->Step, &WorkQueue, true);
+		WorkQueue.RemoveAll();
+
+
+	}
 	// Get a next backward peer ID.
 	LastPeerID = Message->FloodPath.GetTail();
 

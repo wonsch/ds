@@ -89,19 +89,37 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 
 	case EMESSAGE_ASK_GROUPING:
 		{
-			LogPT+= sprintf(LogPT, ", Message = EMESSAGE_ASK_GROUPING");
+			LogPT+= sprintf(LogPT, ", Message = AskGrouping");
 		}
 		break;
 
 	case EMESSAGE_REJECT_GROUPING:
 		{
-			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_REJECT_GROUPING");
+			LogPT+= sprintf(LogPT, ", Message = RejectGrouping");
 		}
 		break;
+
 	case EMESSAGE_ACCEPT_GROUPING:
 		{
-			LogPT+= sprintf(LogPT, ", Message = EMSSAGE_ACCEPT_GROUPING, FloodPath =");
-			for(POSITION pos = Message->GroupMemberID.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->GroupMemberID.GetNext(pos));
+			LogPT+= sprintf(LogPT, ", Message = AcceptGrouping");
+		}
+		break;
+
+	case EMESSAGE_NOTIFY_GROUPING:
+		{
+			LogPT+= sprintf(LogPT, ", Message = NotifyGrouping");
+		}
+		break;
+
+	case EMESSAGE_TRY_ASKING:
+		{
+			LogPT+= sprintf(LogPT, ", Message = TryAsking");
+		}
+		break;
+
+	case EMESSAGE_CONTENT_INFO_UPDATE:
+		{
+			LogPT+= sprintf(LogPT, ", Message = ContentInfoUpdate");
 		}
 		break;
 	}

@@ -335,7 +335,7 @@ bool CSimulator::SimulateOneStep()
 	while(WorkQueue->DeQueue(&Work, &NextNumber) == true)
 	{
 		// Simulate a work.
-		char Log[4096], Dump[4096];
+		char Log[32768], Dump[32768];
 		Dump[0] = 0;
 		Work->Simulate(Log, Dump);
 		if(Verbose == true)

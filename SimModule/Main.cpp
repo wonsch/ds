@@ -4,9 +4,11 @@
 #include "ContentInfo.h"
 
 #define SIMULATOR_THREAD_COUNT					1
-#define PEER_COUNT								1000
+#define PEER_COUNT								10000
+#define GROUP_SIZE								100
 //#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 1000)
-#define SEARCH_CONTENT_COUNT					10
+#define SEARCH_CONTENT_COUNT					5
+
 CwLock PrintLock;
 
 DWORD WINAPI SimulatorThread(LPVOID Argument)
@@ -20,18 +22,30 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 	while(true)
 	{
 		unsigned int RandomSeed = GetTickCount();
-		for(int i = 0;i < 2;i++)
+		for(int i = 0;i < 3;i++)
 		{
 			Sim.Reset(RandomSeed);
+			//Sim.Reset(0);
 			
 			Sim.SetEnvironmentRandomly();
-			Sim.SetGroupMaxMemeberNumber(5); //jin
-			Sim.SetMode(i == 0 ? MODE_CACHE_OFF : MODE_CACHE_ON, MODE_GROUPING_ON); //jin
+			Sim.SetGroupMaxMemeberNumber(GROUP_SIZE); //jin
+			switch(i)
+			{
+			case 0:
+				Sim.SetMode(MODE_CACHE_OFF, MODE_GROUPING_OFF);
+				break;
+			case 1:
+				Sim.SetMode(MODE_CACHE_ON, MODE_GROUPING_OFF);
+				break;
+			case 2:
+				Sim.SetMode(MODE_CACHE_ON, MODE_GROUPING_ON);
+				break;
+			}
 			//Sim.DumpOpen();
 
 			// Insert peers
-			Sim.InsertWorkInsertPeer(1, PEER_COUNT);
-			Sim.SimulateTo(2);
+			for(int j = 0;j < PEER_COUNT / 5;j++) Sim.InsertWorkInsertPeer(j + 1, 5);
+			Sim.SimulateToInfinity();
 
 			// Search a content
 			CContentInfo *ContentInfo = Sim.GetRandomContent();
@@ -40,6 +54,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 				Sim.InsertWorkSearchContent(Sim.Step + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
 				Sim.SimulateToInfinity();
 			}
+
+			if(Sim.StatisticsTotalSearchContentSuccessCount == 0) break;
 
 			// Result Print
 			{
@@ -54,7 +70,6 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 
 				printf("*** Simulation Output\n");
 				//printf("%s\n", Sim.GetLog());
-
 
 				// jin
 				/*printf("================================ PEER GROUP INFO  ================================\n");
@@ -102,7 +117,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			Sim.DumpFinal();
 		}
 
-		//Sleep(1000);
+		//_getch();
+		//Sleep(5000);
 	}
 
 	return 0;
