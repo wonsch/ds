@@ -10,4 +10,5 @@
 #include <assert.h>
 #include <stdio.h>
 #include <conio.h>
+#include "wLock.h"
 #include "wRand.h"

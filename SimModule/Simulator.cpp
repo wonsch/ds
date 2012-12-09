@@ -43,6 +43,7 @@ void CSimulator::Reset(unsigned long RandomSeed)
 	StatisticsTotalSearchContentCount = 0;
 	StatisticsTotalSearchContentSuccessCount = 0;
 	StatisticsTotalSearchContentHopCount = 0;
+	StatisticsTotalMessageCount = 0;
 
 	// Free all allocated memory
 	DeleteAllData();
@@ -65,8 +66,8 @@ void CSimulator::SetEnvironmentDefault()
 void CSimulator::SetEnvironmentRandomly()
 {
 	IsRandomEnrivonment = true;
-	InitNeighborPeerCount = 1 + wRand() % 3;
-	InitContentCount = wRand() % 10;
+	InitNeighborPeerCount = SIM_RANDOM_VALUE;
+	InitContentCount = SIM_RANDOM_VALUE;
 	InitMaxFloodHopCount = 5;
 }
 
@@ -176,13 +177,25 @@ CContentInfo *CSimulator::GetRandomContent()
 
 CAtlString CSimulator::GetStatistics()
 {
+	unsigned int TotalNeighborCount = 0;
+	POSITION pos = PeerInfoMap.GetStartPosition();
+	while(pos != NULL)
+	{
+		TotalNeighborCount+= PeerInfoMap.GetValueAt(pos)->NeighborPeerIDMap.GetCount();
+		PeerInfoMap.GetNext(pos);
+	}
+
 	CAtlString String;
 	String.AppendFormat("Total Peers : %u\n", PeerInfoMap.GetCount());
-	String.AppendFormat("Total Contents : %u\n", ContentInfoMap.GetCount());
+	//String.AppendFormat("Total Contents : %u\n", ContentInfoMap.GetCount());
+	String.AppendFormat("Average Number of Contents per Peer : %g\n", (double)ContentInfoMap.GetCount() / PeerInfoMap.GetCount());
+	//String.AppendFormat("Total Neighbor Peers : %u\n", TotalNeighborCount);
+	String.AppendFormat("Average Number of Neighbor per Peer : %g\n", (double)TotalNeighborCount / PeerInfoMap.GetCount());
+	String.AppendFormat("Total Message Count (Traffic) : %u\n", StatisticsTotalMessageCount);
 	String.AppendFormat("Total Search Content : %u\n", StatisticsTotalSearchContentCount);
 	String.AppendFormat("Total Search Content Success/Failure : %u / %u\n", StatisticsTotalSearchContentSuccessCount, StatisticsTotalSearchContentCount - StatisticsTotalSearchContentSuccessCount);
 	if(StatisticsTotalSearchContentSuccessCount > 0)
-		String.AppendFormat("Total Search Content Average Hops : %.1f\n", (double)StatisticsTotalSearchContentHopCount / StatisticsTotalSearchContentSuccessCount);
+		String.AppendFormat("Total Search Content Average Hops : %g\n", (double)StatisticsTotalSearchContentHopCount / StatisticsTotalSearchContentSuccessCount);
 
 	return String;
 }
@@ -238,7 +251,7 @@ bool CSimulator::SimulateOneStep()
 	if(WorkQueueMap.GetCount() == 0)
 	{
 		// There is no work to simulate.
-		printf("*** Simulation is terminated at step %u\n", Step);
+		if(Verbose == true) printf("*** Simulation is terminated at step %u\n", Step);
 		return false;
 	}
 

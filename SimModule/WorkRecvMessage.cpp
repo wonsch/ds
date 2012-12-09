@@ -73,6 +73,10 @@ void CWorkRecvMessage::Simulate(char *Log)
 }
 
 /*====================jin=========================*/
+int CWorkRecvMessage::MessageRejectGrouping(char* Log)
+{
+	return 0;
+}
 int CWorkRecvMessage::MessageAcceptGrouping(char* Log)
 {
 	char *LogPT = Log;

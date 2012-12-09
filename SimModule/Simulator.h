@@ -1,6 +1,7 @@
 #pragma once
 
 #define SIM_RANDOM_VALUE						-1
+#define SIM_RANDOM_NEIGHBOR_RANGE				3
 
 class CWorkQueue;
 class CWorkBase;
@@ -98,5 +99,6 @@ public:
 	unsigned int								StatisticsTotalSearchContentCount;
 	unsigned int								StatisticsTotalSearchContentSuccessCount;
 	unsigned int								StatisticsTotalSearchContentHopCount;
+	unsigned int								StatisticsTotalMessageCount;
 
 };
