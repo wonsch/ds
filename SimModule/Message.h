@@ -10,6 +10,7 @@ enum EMessage
 	EMESSAGE_ASK_GROUPING,
 	EMSSAGE_REJECT_GROUPING,
 	EMSSAGE_ACCEPT_GROUPING,
+	EMESSAGE_NOTIFY_GROUPING,
 };
 
 class CMessage
@@ -31,14 +32,15 @@ public:
 
 	CAtlList<unsigned int>						FloodPath;
 
-	/*JIN*/
+	/*========================JIN==================================*/
 	void										SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int>* pGroupMemberID);
+	void										SetNotifyGrouping();
 	void										SetAskGrouping();
 	void										SetAskGroupReject();
 	unsigned int								GroupID;
 	unsigned int								GroupMemberNumber;
-	CAtlList<unsigned int>						GroupMemberID;
+	CAtlList<unsigned int>				GroupMemberID;
 
-	/*JIN*/
+	/*========================JIN==================================*/
 
 };

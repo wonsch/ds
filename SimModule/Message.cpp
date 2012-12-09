@@ -16,7 +16,7 @@ void CMessage::SetNotifyNull()
 {
 	Message = EMESSAGE_NOTIFY_NULL;
 }
-/*JIN*/
+/*========================JIN==================================*/
 void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int> *pGroupMemberID)
 {
 	Message = EMSSAGE_ACCEPT_GROUPING;
@@ -24,6 +24,7 @@ void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberN
 	this->GroupID = GroupID;
 	this->GroupMemberNumber = GroupMemberNumber;
 	GroupMemberID.RemoveAll();
+
 	if(pGroupMemberID != NULL) 
 		GroupMemberID.AddTailList(pGroupMemberID);
 
@@ -31,7 +32,7 @@ void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberN
 
 void CMessage::SetAskGrouping()
 {
-	Messgae = EMESSAGE_ASK_GROUPING;
+	Message = EMESSAGE_ASK_GROUPING;
 }
 
 void CMessage::SetAskGroupReject()
@@ -39,8 +40,11 @@ void CMessage::SetAskGroupReject()
 	Message = EMSSAGE_REJECT_GROUPING;
 }
 
-/*JIN*/
-
+/*========================JIN==================================*/
+void CMessage::SetNotifyGrouping()
+{
+	Message = EMESSAGE_NOTIFY_GROUPING;
+}
 void CMessage::SetSearchContent(unsigned int FromPeerID, unsigned int ContentID, CAtlList<unsigned int> *PrevFloodPath, unsigned int PeerIDToInsertFloodPath)
 {
 	Message = EMESSAGE_SEARCH_CONTENT;

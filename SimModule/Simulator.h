@@ -22,11 +22,13 @@ public:
 	////////////////////////////////////////////////////////////////
 	CSimulator(unsigned long RandomSeed = 0);
 	~CSimulator();
+
+	void										SetVerbose(bool Verbose) {this->Verbose = Verbose;}
 	
 	void										Reset(unsigned long RandomSeed = 0);
 	void										SetEnvironmentDefault();
 	void										SetEnvironmentRandomly();
-	void										SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount);
+	void										SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount, unsigned int InitMaxFloodHopCount);
 
 	void										SimulateCount(unsigned int StepCount = 1);
 	void										SimulateTo(unsigned int StepNumber);
@@ -53,10 +55,21 @@ public:
 	int											mode;
 
 	/*   JIN    */
+
+	CAtlString									GetStatistics();
+
+	void										AttachLog(CAtlString &String);
+	CAtlString&									GetLog();
+
+
 private:
 	void										DeleteAllData();
 
 	bool										SimulateOneStep();
+
+	bool										Verbose;
+
+	CAtlString									Log;
 
 public:
 	////////////////////////////////////////////////////////////////
@@ -65,6 +78,7 @@ public:
 	bool										IsRandomEnrivonment;
 	unsigned int								InitNeighborPeerCount;
 	unsigned int								InitContentCount;
+	unsigned int								InitMaxFloodHopCount;
 
 
 	////////////////////////////////////////////////////////////////
@@ -79,5 +93,10 @@ public:
 	CAtlMap<unsigned int, CContentInfo*>		ContentInfoMap; // Map<ContentID, ContentInfo>
 
 	CwRand										wRand;
+
+
+	unsigned int								StatisticsTotalSearchContentCount;
+	unsigned int								StatisticsTotalSearchContentSuccessCount;
+	unsigned int								StatisticsTotalSearchContentHopCount;
 
 };

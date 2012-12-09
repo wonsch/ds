@@ -22,7 +22,7 @@ void CWorkInsertPeer::Simulate(char *Log)
 	CPeerInfo *PeerInfo = new CPeerInfo(++Sim->NewPeerID);
 	
 	/*JIN*/
-	PeerInfo->groupMemberNumber = 1;
+	PeerInfo->currGroupMemberNumber = 1;
 	PeerInfo->groupID = -1;
 	/*JIN*/
 
@@ -47,6 +47,11 @@ void CWorkInsertPeer::Simulate(char *Log)
 			if(PeerID == StartPeerID) break;
 		}
 	}
+	else
+	{
+		PeerInfo->groupID = PeerInfo->PeerID;
+	}
+
 
 	// Set contents.
 	for(unsigned int ContentCount = 0;ContentCount < Sim->InitContentCount;ContentCount++)
@@ -89,10 +94,10 @@ void CWorkInsertPeer::Simulate(char *Log)
 	}
 	
 
-	/*jin*/
+	/*===================== jin ===============================*/
 	// Send Message-ASKGROUPING to neighbors instead of NOTIFICATION MSG
 
-	else if(Sim->mode = GROUPING)
+	else if(Sim->mode == GROUPING)
 	{
 		while(pos != NULL)
 		{
@@ -109,7 +114,7 @@ void CWorkInsertPeer::Simulate(char *Log)
 		}
 	}
 	
-	/*jin*/
+	/*=============== jin ====================================*/
 
 	Sim->InsertWork(Sim->Step, &WorkQueue, true);
 	WorkQueue.RemoveAll();

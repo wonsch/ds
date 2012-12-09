@@ -18,4 +18,10 @@ private:
 	int											MessageSearchContent(char *Log);
 	int											MessageSearchContentResponseSource(char *Log);
 	int											MessageSearchContentResponsePath(char *Log);
+
+	/*Jin*/
+	int											MessageAskGrouping(char* Log);
+	int											MessageRejectGrouping(char* Log);
+	int											MessageAcceptGrouping(char* Log);
+	
 };

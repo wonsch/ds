@@ -52,14 +52,19 @@ void CWorkRecvMessage::Simulate(char *Log)
 			break;
 
 		case EMESSAGE_ASK_GROUPING:
+			LogPT+=MessageAskGrouping(LogPT);
 			// 1. 내 그룹에 새로운 피어가 들어올수 있는지 확인 (max_num , curr_num 비교) 
 			// 2. 가능 x  reject_grouping msg 보내기
 			// 3. 가능 o  curr_member++; accept_grouping msg 보내기 (group id, curr_num, curr_group_member_list)
 			// 4. 자기꺼에서 새로운 피어 그룹자료구조에 넣고, 네이버 자료구조에도 넣기 
 			break;
 		case EMSSAGE_REJECT_GROUPING:
+			// 일단 자기 ID 로 그룹 생성
+			LogPT +=MessageRejectGrouping(LogPT);
 			break;
 		case EMSSAGE_ACCEPT_GROUPING:
+			// 받은 정보로 자신의 그룹 정보를 갱신
+			LogPT += MessageAcceptGrouping(LogPT);
 			break;
 		}
 	}
@@ -67,6 +72,76 @@ void CWorkRecvMessage::Simulate(char *Log)
 	LogPT+= sprintf(LogPT, ")\n");
 }
 
+/*====================jin=========================*/
+int CWorkRecvMessage::MessageAcceptGrouping(char* Log)
+{
+	char *LogPT = Log;
+	// 자기 정보 갱신 
+	// 자기 그룹(승인 노드 뺴고) 노드에게 알림 
+
+	return LogPT- Log;
+
+}
+
+int CWorkRecvMessage::MessageAskGrouping(char *Log)
+{
+	char *LogPT = Log;
+	CWorkQueue WorkQueue;
+	CWorkSendMessage *WorkSendMessage;
+	WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, SrcPeerID);
+	WorkSendMessage->Message = new CMessage(DstPeerInfo->GetNewMessageID());
+	// 1. 내 그룹에 새로운 피어가 들어올수 있는지 확인 (max_num , curr_num 비교) 
+	
+	
+	
+	if(DstPeerInfo->currGroupMemberNumber < Sim->GroupMaxNumber )
+	{
+		// 3. 가능 o  curr_member++; accept_grouping msg 보내기 (group id, curr_num, curr_group_member_list)
+		// 4. 자기꺼에서 새로운 피어 그룹자료구조에 넣고, 네이버 자료구조에도 넣기
+		CAtlList<unsigned int> groupList;
+		groupList.AddTail(DstPeerInfo->PeerID);
+
+		POSITION pos = DstPeerInfo->GroupPeerIDMap.GetStartPosition();
+
+		while(pos != NULL)
+		{
+			unsigned int GroupPeerID;
+			void *Temp;
+			DstPeerInfo->GroupPeerIDMap.GetNextAssoc(pos,GroupPeerID,Temp);
+			groupList.AddTail(GroupPeerID);
+			LogPT+= sprintf(LogPT, " %u", GroupPeerID);
+		}
+		
+		  
+		DstPeerInfo->GroupPeerIDMap.SetAt(this->SrcPeerID,NULL);  //my그룹에 넣기
+		DstPeerInfo->currGroupMemberNumber += 1;
+
+		WorkSendMessage->Message->SetAskGroupAccept(DstPeerInfo->groupID,DstPeerInfo->currGroupMemberNumber,&groupList);
+		WorkQueue.QueueAtTail(WorkSendMessage);
+
+
+	}
+	else  // 그룹 꽉 찾음
+	{
+		// 2. 가능 x  reject_grouping msg 보내기
+		WorkSendMessage->Message->SetAskGroupReject();  //other그룹에 넣기
+		WorkQueue.QueueAtTail(WorkSendMessage);
+
+		DstPeerInfo->OtherGroupPeerIDMap.SetAt(this->SrcPeerID, NULL);
+		
+	}
+
+	DstPeerInfo->NeighborPeerIDMap.SetAt(this->SrcPeerID,NULL); // total neighbor 그룹에 넣기
+
+	Sim->InsertWork(Sim->Step, &WorkQueue, true);
+	WorkQueue.RemoveAll();
+
+	return LogPT - Log;
+
+}
+
+
+/*====================jin=========================*/
 int CWorkRecvMessage::MessageEmpty(char *Log)
 {
 	return 0;
@@ -122,11 +197,20 @@ int CWorkRecvMessage::MessageSearchContent(char *Log)
 		WorkQueue.RemoveAll();
 
 		LogPT+= sprintf(LogPT, ")\n    Response content searching message. (");
+
+		CAtlString String;
+		String.Format("Step %u : Peer %u has a content %08X. (FromPeerID = %u, Hops = %u)\n", Sim->Step, DstPeerID, Message->ContentID, SrcPeerID, Message->FloodPath.GetCount());
+		Sim->AttachLog(String);
+
+		Sim->StatisticsTotalSearchContentHopCount+= Message->FloodPath.GetCount();
+
 		return LogPT - Log;
 	}
 
 	// Send the search messages to neighbors.
 	LogPT+= sprintf(LogPT, ")\n    Transit content searching message. (NeighborPeerIDs =");
+
+	if(Message->FloodPath.GetCount() >= Sim->InitMaxFloodHopCount) return LogPT - Log;
 
 	// Transit this message to neighbors.
 	CWorkQueue WorkQueue;
@@ -158,6 +242,11 @@ int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log)
 	char *LogPT = Log;
 
 	// TODO: The peer received a response of searching content.
+	Sim->StatisticsTotalSearchContentSuccessCount++;
+	CAtlString String;
+	String.Format("Step %u : Peer %u found a content %08X at peer %u.\n", Sim->Step, SrcPeerID, Message->ContentID, DstPeerID);
+	Sim->AttachLog(String);
+
 	LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X", Message->FromPeerID, Message->ContentID);
 
 	return LogPT - Log;

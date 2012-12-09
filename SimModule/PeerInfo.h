@@ -29,10 +29,11 @@ public:
 
 	/* JIN */
 	unsigned int groupID;
-	unsigned int groupMemberNumber;
+	unsigned int currGroupMemberNumber;
 
 	CAtlMap<unsigned int, void*> GroupPeerIDMap; // group peer id
-	CAtlMap<unsigned int, CAtlMap<unsigned int, CContentInfo*>*> NeighborContentInfoList;  //the info of neighbor content
+	CAtlMap<unsigned int, void*> OtherGroupPeerIDMap; // other group peer id
+	CAtlMap<unsigned int, CAtlMap<unsigned int, CContentInfo*>*> ContentLocationInfo;  //the info of neighbor content
 	
 
 											 
