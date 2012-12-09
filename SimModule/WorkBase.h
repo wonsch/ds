@@ -9,7 +9,7 @@ public:
 	CWorkBase(CSimulator *Simulator);
 	virtual ~CWorkBase();
 
-	virtual	void								Simulate(char *Log);
+	virtual	void								Simulate(char *Log, char *Dump);
 
 	CWorkBase*									NextLink;
 	CSimulator*									Sim;

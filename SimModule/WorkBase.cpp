@@ -19,7 +19,7 @@ CWorkBase::~CWorkBase()
 {
 }
 
-void CWorkBase::Simulate(char *Log)
+void CWorkBase::Simulate(char *Log, char *Dump)
 {
 	// This function will never be called.
 	assert(false);

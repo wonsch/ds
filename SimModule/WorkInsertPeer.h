@@ -8,5 +8,5 @@ public:
 	CWorkInsertPeer(CSimulator *Simulator);
 	~CWorkInsertPeer();
 
-	virtual	void								Simulate(char *Log);
+	virtual	void								Simulate(char *Log, char *Dump);
 };

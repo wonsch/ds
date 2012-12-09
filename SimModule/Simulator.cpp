@@ -124,13 +124,15 @@ void CSimulator::DumpOpen()
 	sprintf(FileName, "Sim_%08X_CACHE_%s_GROUP_%s.log", InitRandomSeed, CacheMode == MODE_CACHE_OFF ? "OFF" : "ON", GroupMode == MODE_GROUPING_OFF ? "OFF" : "ON");
 	DumpFile = fopen(FileName, "w");
 	assert(DumpFile != NULL);
+
+	fprintf(DumpFile, "; Dump for simulator\n");
 }
 
 void CSimulator::DumpFinal()
 {
 	if(DumpFile == NULL) return;
 
-	fprintf(DumpFile, "[SIMULATIONINFO]\n");
+	fprintf(DumpFile, "\n[SIMULATIONINFO]\n");
 	fprintf(DumpFile, "PEERCOUNT=%u\n", PeerInfoMap.GetCount());
 	fprintf(DumpFile, "CYCLECOUNT=%u\n", Step);
 }
@@ -147,7 +149,7 @@ void CSimulator::DumpPeers()
 		CPeerInfo *PeerInfo;
 		PeerInfoMap.GetNextAssoc(pos1, PeerID, PeerInfo);
 
-		fprintf(DumpFile, "[CYCLE%u.PEER%u]\n", Step, ++PeerCount);
+		fprintf(DumpFile, "\n[CYCLE%u.PEER%u]\n", Step, ++PeerCount);
 		fprintf(DumpFile, "PID=%u\n", PeerID);
 		fprintf(DumpFile, "NEIGHBOR=");
 
@@ -328,22 +330,26 @@ bool CSimulator::SimulateOneStep()
 
 	// Get works from the WorkQueue and simulate each work.
 	CWorkBase *Work;
-	unsigned int PrevNumber = 0, InNextNumber, ExNextNumber;
-	while(WorkQueue->DeQueue(&Work, &InNextNumber, &ExNextNumber) == true)
+	unsigned int PrevNumber = 0, NextNumber, DumpNumber = 0;
+	while(WorkQueue->DeQueue(&Work, &NextNumber) == true)
 	{
-		// Write a dump for this step
-		if(DumpFile != NULL) fprintf(DumpFile, "[CYCLE%u.EVENT%u]\n", Step, InNextNumber);
-
 		// Simulate a work.
-		char Log[4096];
-		Work->Simulate(Log);
+		char Log[4096], Dump[4096];
+		Dump[0] = 0;
+		Work->Simulate(Log, Dump);
 		if(Verbose == true)
 		{
-			if(PrevNumber != ExNextNumber) printf("- Work %u>\n", ExNextNumber);
+			if(PrevNumber != NextNumber) printf("- Work %u>\n", NextNumber);
 			printf("%s", Log);
 		}
 		delete Work;
-		PrevNumber = ExNextNumber;
+		PrevNumber = NextNumber;
+
+		// Write a dump for this step
+		if(DumpFile != NULL && Dump[0] != NULL)
+		{
+			fprintf(DumpFile, "\n[CYCLE%u.EVENT%u]\n%s", Step, ++DumpNumber, Dump);
+		}
 
 		// Change the environment.
 		if(IsRandomEnrivonment == true) SetEnvironmentRandomly();
@@ -354,9 +360,9 @@ bool CSimulator::SimulateOneStep()
 	// Dump this step info.
 	if(DumpFile != NULL)
 	{
-		fprintf(DumpFile, "[CYCLE%u]\n", Step);
+		fprintf(DumpFile, "\n[CYCLE%u]\n", Step);
 		fprintf(DumpFile, "PEERNUM=%u\n", PeerInfoMap.GetCount());
-		fprintf(DumpFile, "EVENTNUM=%u\n", ExNextNumber);
+		fprintf(DumpFile, "EVENTNUM=%u\n", DumpNumber);
 
 		// Dump peers info.
 		DumpPeers();

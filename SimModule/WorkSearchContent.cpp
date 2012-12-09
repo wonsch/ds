@@ -15,7 +15,7 @@ CWorkSearchContent::~CWorkSearchContent()
 {
 }
 
-void CWorkSearchContent::Simulate(char *Log)
+void CWorkSearchContent::Simulate(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 	LogPT+= sprintf(LogPT, "    Peer searches a content.");

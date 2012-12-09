@@ -8,7 +8,7 @@ public:
 	CWorkSearchContent(CSimulator *Simulator, unsigned int PeerID, unsigned int ContentID);
 	~CWorkSearchContent();
 
-	virtual	void								Simulate(char *Log);
+	virtual	void								Simulate(char *Log, char *Dump);
 
 	unsigned int								PeerID;
 	unsigned int								ContentID;

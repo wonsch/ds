@@ -14,7 +14,7 @@ CWorkRecvMessage::~CWorkRecvMessage()
 {
 }
 
-void CWorkRecvMessage::Simulate(char *Log)
+void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 {
 	assert(Message != NULL);
 
@@ -28,31 +28,31 @@ void CWorkRecvMessage::Simulate(char *Log)
 		{
 		case EMESSAGE_EMPTY:
 			// Empty
-			LogPT+= MessageEmpty(LogPT);
+			LogPT+= MessageEmpty(LogPT, Dump);
 			break;
 
 		case EMESSAGE_NOTIFY_NULL:
 			// Notify NULL
-			LogPT+= MessageNotifyNull(LogPT);
+			LogPT+= MessageNotifyNull(LogPT, Dump);
 			break;
 
 		case EMESSAGE_SEARCH_CONTENT:
 			// Search a content
-			LogPT+= MessageSearchContent(LogPT);
+			LogPT+= MessageSearchContent(LogPT, Dump);
 			break;
 		
 		case EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE:
 			// Response a searching content message to source.
-			LogPT+= MessageSearchContentResponseSource(LogPT);
+			LogPT+= MessageSearchContentResponseSource(LogPT, Dump);
 			break;
 
 		case EMESSAGE_SEARCH_CONTENT_RESPONSE_PATH:
 			// Response a searching content message to peers which is on the flood path.
-			LogPT+= MessageSearchContentResponsePath(LogPT);
+			LogPT+= MessageSearchContentResponsePath(LogPT, Dump);
 			break;
 // JIN==========================================================================
 		case EMESSAGE_ASK_GROUPING:
-			LogPT+=MessageAskGrouping(LogPT);
+			LogPT+=MessageAskGrouping(LogPT, Dump);
 			// 1. 내 그룹에 새로운 피어가 들어올수 있는지 확인 (max_num , curr_num 비교) 
 			// 2. 가능 x  reject_grouping msg 보내기
 			// 3. 가능 o  curr_member++; accept_grouping msg 보내기 (group id, curr_num, curr_group_member_list)
@@ -60,17 +60,17 @@ void CWorkRecvMessage::Simulate(char *Log)
 			break;
 		case EMESSAGE_REJECT_GROUPING:
 			// 일단 자기 ID 로 그룹 생성
-			LogPT +=MessageRejectGrouping(LogPT);
+			LogPT +=MessageRejectGrouping(LogPT, Dump);
 			break;
 		case EMESSAGE_ACCEPT_GROUPING:
 			// 받은 정보로 자신의 그룹 정보를 갱신
-			LogPT += MessageAcceptGrouping(LogPT);
+			LogPT += MessageAcceptGrouping(LogPT, Dump);
 			break;
 		case EMESSAGE_NOTIFY_GROUPING:
-			LogPT += MessageNotifyGrouping(LogPT);
+			LogPT += MessageNotifyGrouping(LogPT, Dump);
 			break;
 		case EMESSAGE_TRY_ASKING:
-			LogPT += MessageTryAsking(LogPT);
+			LogPT += MessageTryAsking(LogPT, Dump);
 			break;
 		case EMESSAGE_CONTENT_INFO_UPDATE:
 			LogPT += MessageUpdateContentInfo(LogPT);
@@ -83,6 +83,7 @@ void CWorkRecvMessage::Simulate(char *Log)
 }
 
 /*====================jin=========================*/
+
 int CWorkRecvMessage::MessageUpdateContentInfo(char* Log)
 {
 	char* LogPT = Log;
@@ -90,7 +91,10 @@ int CWorkRecvMessage::MessageUpdateContentInfo(char* Log)
 
 	return LogPT - Log;
 }
-int CWorkRecvMessage::MessageTryAsking(char* Log)
+
+
+int CWorkRecvMessage::MessageTryAsking(char *Log, char *Dump)
+
 {
 	char* LogPT = Log;
 	CWorkQueue WorkQueue;
@@ -117,7 +121,7 @@ int CWorkRecvMessage::MessageTryAsking(char* Log)
 	return LogPT - Log; 
 
 }
-int CWorkRecvMessage::MessageRejectGrouping(char* Log)
+int CWorkRecvMessage::MessageRejectGrouping(char *Log, char *Dump)
 {
 	char* LogPT = Log;
 		// 자기 정보 갱신 
@@ -128,7 +132,7 @@ int CWorkRecvMessage::MessageRejectGrouping(char* Log)
 	}
 	return LogPT - Log;
 }
-int CWorkRecvMessage::MessageNotifyGrouping(char* Log)
+int CWorkRecvMessage::MessageNotifyGrouping(char *Log, char *Dump)
 {
 	char* LogPT = Log;
 	unsigned int count = 1;
@@ -144,7 +148,7 @@ int CWorkRecvMessage::MessageNotifyGrouping(char* Log)
 
 	return LogPT - Log;
 }
-int CWorkRecvMessage::MessageAcceptGrouping(char* Log)
+int CWorkRecvMessage::MessageAcceptGrouping(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 	CWorkQueue WorkQueue;
@@ -183,7 +187,7 @@ int CWorkRecvMessage::MessageAcceptGrouping(char* Log)
 
 }
 
-int CWorkRecvMessage::MessageAskGrouping(char *Log)
+int CWorkRecvMessage::MessageAskGrouping(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 	CWorkQueue WorkQueue;
@@ -250,12 +254,12 @@ int CWorkRecvMessage::MessageAskGrouping(char *Log)
 
 
 /*====================jin END=========================*/
-int CWorkRecvMessage::MessageEmpty(char *Log)
+int CWorkRecvMessage::MessageEmpty(char *Log, char *Dump)
 {
 	return 0;
 }
 
-int CWorkRecvMessage::MessageNotifyNull(char *Log)
+int CWorkRecvMessage::MessageNotifyNull(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 
@@ -268,7 +272,7 @@ int CWorkRecvMessage::MessageNotifyNull(char *Log)
 	return LogPT - Log;
 }
 
-int CWorkRecvMessage::MessageSearchContent(char *Log)
+int CWorkRecvMessage::MessageSearchContent(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 
@@ -361,7 +365,7 @@ int CWorkRecvMessage::MessageSearchContent(char *Log)
 	return LogPT - Log;
 }
 
-int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log)
+int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 
@@ -382,7 +386,7 @@ int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log)
 	return LogPT - Log;
 }
 
-int CWorkRecvMessage::MessageSearchContentResponsePath(char *Log)
+int CWorkRecvMessage::MessageSearchContentResponsePath(char *Log, char *Dump)
 {
 	char *LogPT = Log;
 
