@@ -1,34 +1,20 @@
 #pragma once
 
-#define SIM_RANDOM_VALUE						-1
-#define SIM_RANDOM_NEIGHBOR_RANGE				3
-#define SIM_MAX_FLOOD_HOP_COUNT					6
+#include "SimulatorEx.h"
 
 class CWorkQueue;
 class CWorkBase;
 class CPeerInfo;
 class CContentInfo;
 
-enum ECacheMode
-{
-	MODE_CACHE_OFF = 0,
-	MODE_CACHE_ON,
-};
-
-enum EGroupMode
-{
-	MODE_GROUPING_OFF = 0,
-	MODE_GROUPING_ON,
-};
-
-class CSimulator
+class CSimulatorIn
 {
 public:
 	////////////////////////////////////////////////////////////////
 	// For user
 	////////////////////////////////////////////////////////////////
-	CSimulator(unsigned long RandomSeed = 0);
-	~CSimulator();
+	CSimulatorIn(unsigned long RandomSeed = 0);
+	~CSimulatorIn();
 
 	void										SetVerbose(bool Verbose) {this->Verbose = Verbose;}
 	void										SetMode(ECacheMode CacheMode, EGroupMode GroupMode);
@@ -61,7 +47,7 @@ public:
 	/*   JIN    */
 
 	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
-	void										SetContentInfoFloodingTTL( int ttl);
+	void										SetContentInfoFloodingTTL(int ttl);
 	int											TTLContentInfo;
 	unsigned int								GroupMaxNumber;
 	ECacheMode									CacheMode;
@@ -69,11 +55,15 @@ public:
 
 	/*   JIN    */
 
+	unsigned int								GetStatisticsTotalSearchContentCount() {return StatisticsTotalSearchContentCount;}
+	unsigned int								GetStatisticsTotalSearchContentSuccessCount() {return StatisticsTotalSearchContentSuccessCount;}
+	unsigned int								GetStatisticsTotalSearchContentHopCount() {return StatisticsTotalSearchContentHopCount;}
+	unsigned int								GetStatisticsTotalMessageCount() {return StatisticsTotalMessageCount;}
+
 	CAtlString									GetStatistics();
 
 	void										AttachLog(CAtlString &String);
 	CAtlString&									GetLog();
-
 
 private:
 	void										DeleteAllData();

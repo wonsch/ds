@@ -8,7 +8,7 @@ CWorkBase::CWorkBase()
 	DontIncreaseWorkNumber = false;
 }
 
-CWorkBase::CWorkBase(CSimulator *Simulator)
+CWorkBase::CWorkBase(CSimulatorIn *Simulator)
 {
 	NextLink = NULL;
 	Sim = Simulator;

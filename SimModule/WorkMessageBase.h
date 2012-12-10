@@ -6,7 +6,7 @@
 class CWorkMessageBase : public CWorkBase
 {
 public:
-	CWorkMessageBase(CSimulator *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID);
+	CWorkMessageBase(CSimulatorIn *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID);
 	~CWorkMessageBase();
 
 	bool										IsSource(unsigned int PeerID) {return PeerID == SrcPeerID;}

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WorkMessageBase.h"
 
-CWorkMessageBase::CWorkMessageBase(CSimulator *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID) : CWorkBase(Simulator)
+CWorkMessageBase::CWorkMessageBase(CSimulatorIn *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID) : CWorkBase(Simulator)
 {
 	this->SrcPeerID = SrcPeerID;
 	this->DstPeerID = DstPeerID;

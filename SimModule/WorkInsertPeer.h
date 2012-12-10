@@ -5,7 +5,7 @@
 class CWorkInsertPeer : public CWorkBase
 {
 public:
-	CWorkInsertPeer(CSimulator *Simulator);
+	CWorkInsertPeer(CSimulatorIn *Simulator);
 	~CWorkInsertPeer();
 
 	virtual	void								Simulate(char *Log, char *Dump);

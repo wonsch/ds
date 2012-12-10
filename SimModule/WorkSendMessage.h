@@ -5,7 +5,7 @@
 class CWorkSendMessage : public CWorkMessageBase
 {
 public:
-	CWorkSendMessage(CSimulator *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID);
+	CWorkSendMessage(CSimulatorIn *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID);
 	~CWorkSendMessage();
 
 	virtual	void								Simulate(char *Log, char *Dump);

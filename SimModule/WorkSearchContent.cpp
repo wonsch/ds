@@ -5,7 +5,7 @@
 #include "PeerInfo.h"
 #include "ContentInfo.h"
 
-CWorkSearchContent::CWorkSearchContent(CSimulator *Simulator, unsigned int PeerID, unsigned int ContentID) : CWorkBase(Simulator)
+CWorkSearchContent::CWorkSearchContent(CSimulatorIn *Simulator, unsigned int PeerID, unsigned int ContentID) : CWorkBase(Simulator)
 {
 	this->PeerID = PeerID;
 	this->ContentID = ContentID;
@@ -79,7 +79,7 @@ void CWorkSearchContent::Simulate(char *Log, char *Dump)
 	WorkQueue.RemoveAll();
 
 	CAtlString String;
-	String.Format("Step %u : Peer %u searches a content %08X.\n", Sim->Step, PeerID, ContentID);
+	String.Format("Step %u : Peer %u searches a content %08X.\r\n", Sim->Step, PeerID, ContentID);
 	Sim->AttachLog(String);
 
 	LogPT+= sprintf(LogPT, ")\n");

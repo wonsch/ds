@@ -5,7 +5,7 @@
 #include "PeerInfo.h"
 #include "ContentInfo.h"
 
-CWorkRecvMessage::CWorkRecvMessage(CSimulator *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID) : CWorkMessageBase(Simulator, SrcPeerID, DstPeerID)
+CWorkRecvMessage::CWorkRecvMessage(CSimulatorIn *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID) : CWorkMessageBase(Simulator, SrcPeerID, DstPeerID)
 {
 	DstPeerInfo = NULL;
 }
@@ -34,11 +34,25 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 		case EMESSAGE_NOTIFY_NULL:
 			// Notify NULL
 			LogPT+= MessageNotifyNull(LogPT, Dump);
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=RECV_NOTIFY_NULL\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ENOTE=Peer %u receives a notify message to peer %u.\n", DstPeerID, SrcPeerID);
 			break;
 
 		case EMESSAGE_SEARCH_CONTENT:
 			// Search a content
 			LogPT+= MessageSearchContent(LogPT, Dump);
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=RECV_SEARCH_CONTENT\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", SrcPeerID);
+			//Dump+= sprintf(Dump, "ENOTE=\n");
 			break;
 		
 		case EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE:
@@ -57,6 +71,13 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 			// 2. 가능 x  reject_grouping msg 보내기
 			// 3. 가능 o  curr_member++; accept_grouping msg 보내기 (group id, curr_num, curr_group_member_list)
 			// 4. 자기꺼에서 새로운 피어 그룹자료구조에 넣고, 네이버 자료구조에도 넣기 
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=RECV_ASK_GROUPING\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ENOTE=\n");
 			break;
 		case EMESSAGE_REJECT_GROUPING:
 			// 일단 자기 ID 로 그룹 생성
@@ -336,7 +357,7 @@ int CWorkRecvMessage::MessageSearchContent(char *Log, char *Dump)
 		else LogPT+= sprintf(LogPT, "Cache");
 
 		CAtlString String;
-		String.Format("Step %u : Peer %u has a content %08X. (FromPeerID = %u, Hops = %u, ResponseFrom = %s)\n", Sim->Step, DstPeerID, Message->ContentID, Message->FromPeerID, Message->FloodPath.GetCount(), (ResponseFrom == ERESPONSE_FROM_SOURCE ? "Source" : "Cache"));
+		String.Format("Step %u : Peer %u has a content %08X. (FromPeerID = %u, Hops = %u, ResponseFrom = %s)\r\n", Sim->Step, DstPeerID, Message->ContentID, Message->FromPeerID, Message->FloodPath.GetCount(), (ResponseFrom == ERESPONSE_FROM_SOURCE ? "Source" : "Cache"));
 		Sim->AttachLog(String);
 
 		return LogPT - Log;
@@ -385,7 +406,7 @@ int CWorkRecvMessage::MessageSearchContentResponseSource(char *Log, char *Dump)
 	}
 
 	CAtlString String;
-	String.Format("Step %u : Peer %u found a content %08X. (SrcPeerID = %u, FromPeerID = %u, Hops = %u, ResponseFrom = %s).\n", Sim->Step, DstPeerID, Message->ContentID, SrcPeerID, Message->FromPeerID, Message->Hops, (Message->ResponseFrom == ERESPONSE_FROM_SOURCE ? "Source" : "Cache"));
+	String.Format("Step %u : Peer %u found a content %08X. (SrcPeerID = %u, FromPeerID = %u, Hops = %u, ResponseFrom = %s).\r\n", Sim->Step, DstPeerID, Message->ContentID, SrcPeerID, Message->FromPeerID, Message->Hops, (Message->ResponseFrom == ERESPONSE_FROM_SOURCE ? "Source" : "Cache"));
 	Sim->AttachLog(String);
 
 	LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X, Hops = %u", Message->FromPeerID, Message->ContentID, Message->Hops);

@@ -1,12 +1,12 @@
 #include "stdafx.h"
-#include "Simulator.h"
+#include "SimulatorIn.h"
 #include "WorkQueue.h"
 #include "WorkInsertPeer.h"
 #include "WorkSearchContent.h"
 #include "PeerInfo.h"
 #include "ContentInfo.h"
 
-CSimulator::CSimulator(unsigned long RandomSeed)
+CSimulatorIn::CSimulatorIn(unsigned long RandomSeed)
 {
 	Verbose = true;
 	DumpFile = NULL;
@@ -14,7 +14,7 @@ CSimulator::CSimulator(unsigned long RandomSeed)
 	Reset(RandomSeed);
 }
 
-CSimulator::~CSimulator()
+CSimulatorIn::~CSimulatorIn()
 {
 	if(DumpFile != NULL) fclose(DumpFile);
 
@@ -23,23 +23,23 @@ CSimulator::~CSimulator()
 }
 
 /*=====================JIN=======================*/
-void CSimulator::SetContentInfoFloodingTTL(int ttl)
+void CSimulatorIn::SetContentInfoFloodingTTL(int ttl)
 {
 	TTLContentInfo = ttl;
 }
-void CSimulator::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
+void CSimulatorIn::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
 {
 	GroupMaxNumber = MaxNumber;
 }
 /*=====================JIN=======================*/
 
-void CSimulator::SetMode(ECacheMode CacheMode, EGroupMode GroupMode)
+void CSimulatorIn::SetMode(ECacheMode CacheMode, EGroupMode GroupMode)
 {
 	this->CacheMode = CacheMode;
 	this->GroupMode = GroupMode;
 }
 
-void CSimulator::Reset(unsigned long RandomSeed)
+void CSimulatorIn::Reset(unsigned long RandomSeed)
 {
 	CacheMode = MODE_CACHE_OFF;
 	GroupMode = MODE_GROUPING_OFF;
@@ -68,7 +68,7 @@ void CSimulator::Reset(unsigned long RandomSeed)
 	GroupMaxNumber = 0;
 }
 
-void CSimulator::SetEnvironmentDefault()
+void CSimulatorIn::SetEnvironmentDefault()
 {
 	IsRandomEnrivonment = false;
 	InitNeighborPeerCount = 1;
@@ -76,7 +76,7 @@ void CSimulator::SetEnvironmentDefault()
 	InitMaxFloodHopCount = SIM_MAX_FLOOD_HOP_COUNT;
 }
 
-void CSimulator::SetEnvironmentRandomly()
+void CSimulatorIn::SetEnvironmentRandomly()
 {
 	IsRandomEnrivonment = true;
 	InitNeighborPeerCount = SIM_RANDOM_VALUE;
@@ -84,7 +84,7 @@ void CSimulator::SetEnvironmentRandomly()
 	InitMaxFloodHopCount = SIM_MAX_FLOOD_HOP_COUNT;
 }
 
-void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount, unsigned int InitMaxFloodHopCount)
+void CSimulatorIn::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount, unsigned int InitMaxFloodHopCount)
 {
 	IsRandomEnrivonment = false;
 	this->InitNeighborPeerCount = InitNeighborPeerCount;
@@ -92,7 +92,7 @@ void CSimulator::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsi
 	this->InitMaxFloodHopCount = InitMaxFloodHopCount;
 }
 
-void CSimulator::SimulateCount(unsigned int StepCount)
+void CSimulatorIn::SimulateCount(unsigned int StepCount)
 {
 	for(unsigned int i = 0;i < StepCount;i++)
 	{
@@ -100,7 +100,7 @@ void CSimulator::SimulateCount(unsigned int StepCount)
 	}
 }
 
-void CSimulator::SimulateTo(unsigned int StepNumber)
+void CSimulatorIn::SimulateTo(unsigned int StepNumber)
 {
 	for(unsigned int i = Step;i < StepNumber;i++)
 	{
@@ -108,19 +108,19 @@ void CSimulator::SimulateTo(unsigned int StepNumber)
 	}
 }
 
-void CSimulator::InsertWorkInsertPeer(unsigned int StepNumber, unsigned int PeerCount)
+void CSimulatorIn::InsertWorkInsertPeer(unsigned int StepNumber, unsigned int PeerCount)
 {
 	for(unsigned int i = 0;i < PeerCount;i++) InsertWork(StepNumber, new CWorkInsertPeer(this));
 }
 
-void CSimulator::InsertWorkSearchContent(unsigned int StepNumber, unsigned int PeerID, unsigned int ContentID)
+void CSimulatorIn::InsertWorkSearchContent(unsigned int StepNumber, unsigned int PeerID, unsigned int ContentID)
 {
 	StatisticsTotalSearchContentCount++;
 
 	InsertWork(StepNumber, new CWorkSearchContent(this, PeerID, ContentID));
 }
 
-void CSimulator::DumpOpen()
+void CSimulatorIn::DumpOpen()
 {
 	// Open a dump file
 	if(DumpFile != NULL) fclose(DumpFile);
@@ -132,7 +132,7 @@ void CSimulator::DumpOpen()
 	fprintf(DumpFile, "; Dump for simulator\n");
 }
 
-void CSimulator::DumpFinal()
+void CSimulatorIn::DumpFinal()
 {
 	if(DumpFile == NULL) return;
 
@@ -144,7 +144,7 @@ void CSimulator::DumpFinal()
 	DumpFile = NULL;
 }
 
-void CSimulator::DumpPeers()
+void CSimulatorIn::DumpPeers()
 {
 	if(DumpFile == NULL) return;
 
@@ -175,7 +175,7 @@ void CSimulator::DumpPeers()
 	}
 }
 
-void CSimulator::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool AtHead)
+void CSimulatorIn::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool AtHead)
 {
 	// Is StepNumber already passed?
 	if(StepNumber < Step) return;
@@ -193,7 +193,7 @@ void CSimulator::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool AtHe
 	else WorkQueue->QueueAtTail(Work);
 }
 
-void CSimulator::InsertWork(unsigned int StepNumber, CWorkBase *Work, bool AtHead)
+void CSimulatorIn::InsertWork(unsigned int StepNumber, CWorkBase *Work, bool AtHead)
 {
 	// Is StepNumber already passed?
 	if(StepNumber < Step) return;
@@ -211,7 +211,7 @@ void CSimulator::InsertWork(unsigned int StepNumber, CWorkBase *Work, bool AtHea
 	else WorkQueue->QueueAtTail(Work);
 }
 
-CPeerInfo *CSimulator::GetRandomPeer()
+CPeerInfo *CSimulatorIn::GetRandomPeer()
 {
 	// Get a random peer which exists.
 	POSITION pos = PeerInfoMap.GetStartPosition();
@@ -227,7 +227,7 @@ CPeerInfo *CSimulator::GetRandomPeer()
 	return PeerInfo;
 }
 
-CContentInfo *CSimulator::GetRandomContent()
+CContentInfo *CSimulatorIn::GetRandomContent()
 {
 	// Get a random content which exists.
 	POSITION pos = ContentInfoMap.GetStartPosition();
@@ -243,7 +243,7 @@ CContentInfo *CSimulator::GetRandomContent()
 	return ContentInfo;
 }
 
-CAtlString CSimulator::GetStatistics()
+CAtlString CSimulatorIn::GetStatistics()
 {
 	unsigned int TotalNeighborCount = 0;
 	POSITION pos = PeerInfoMap.GetStartPosition();
@@ -254,33 +254,33 @@ CAtlString CSimulator::GetStatistics()
 	}
 
 	CAtlString String;
-	String.AppendFormat("RandomSeed : %u\n", InitRandomSeed);
-	String.AppendFormat("CacheMode/GroupMode : %s/%s\n", CacheMode == MODE_CACHE_OFF ? "OFF" : "ON", GroupMode == MODE_GROUPING_OFF ? "OFF" : "ON");
-	String.AppendFormat("Total Peers : %u\n", PeerInfoMap.GetCount());
-	//String.AppendFormat("Total Contents : %u\n", ContentInfoMap.GetCount());
-	String.AppendFormat("Average Number of Contents per Peer : %g\n", (double)ContentInfoMap.GetCount() / PeerInfoMap.GetCount());
-	//String.AppendFormat("Total Neighbor Peers : %u\n", TotalNeighborCount);
-	String.AppendFormat("Average Number of Neighbor per Peer : %g\n", (double)TotalNeighborCount / PeerInfoMap.GetCount());
-	String.AppendFormat("Total Message Count (Traffic) : %u\n", StatisticsTotalMessageCount);
-	String.AppendFormat("Total Search Content : %u\n", StatisticsTotalSearchContentCount);
-	String.AppendFormat("Total Search Content Success/Failure : %u / %u\n", StatisticsTotalSearchContentSuccessCount, StatisticsTotalSearchContentCount - StatisticsTotalSearchContentSuccessCount);
+	String.AppendFormat("RandomSeed : %u\r\n", InitRandomSeed);
+	String.AppendFormat("CacheMode/GroupMode : %s/%s\r\n", CacheMode == MODE_CACHE_OFF ? "OFF" : "ON", GroupMode == MODE_GROUPING_OFF ? "OFF" : "ON");
+	String.AppendFormat("Total Peers : %u\r\n", PeerInfoMap.GetCount());
+	//String.AppendFormat("Total Contents : %u\r\n", ContentInfoMap.GetCount());
+	String.AppendFormat("Average Number of Contents per Peer : %g\r\n", (double)ContentInfoMap.GetCount() / PeerInfoMap.GetCount());
+	//String.AppendFormat("Total Neighbor Peers : %u\r\n", TotalNeighborCount);
+	String.AppendFormat("Average Number of Neighbor per Peer : %g\r\n", (double)TotalNeighborCount / PeerInfoMap.GetCount());
+	String.AppendFormat("Total Message Count (Traffic) : %u\r\n", StatisticsTotalMessageCount);
+	String.AppendFormat("Total Search Content : %u\r\n", StatisticsTotalSearchContentCount);
+	String.AppendFormat("Total Search Content Success/Failure : %u / %u\r\n", StatisticsTotalSearchContentSuccessCount, StatisticsTotalSearchContentCount - StatisticsTotalSearchContentSuccessCount);
 	if(StatisticsTotalSearchContentSuccessCount > 0)
-		String.AppendFormat("Total Search Content Average Hops : %g\n", (double)StatisticsTotalSearchContentHopCount / StatisticsTotalSearchContentSuccessCount);
+		String.AppendFormat("Average Number of Hops per Search Content Success : %g\r\n", (double)StatisticsTotalSearchContentHopCount / StatisticsTotalSearchContentSuccessCount);
 
 	return String;
 }
 
-void CSimulator::AttachLog(CAtlString &String)
+void CSimulatorIn::AttachLog(CAtlString &String)
 {
 	Log+= String;
 }
 
-CAtlString &CSimulator::GetLog()
+CAtlString &CSimulatorIn::GetLog()
 {
 	return Log;
 }
 
-void CSimulator::DeleteAllData()
+void CSimulatorIn::DeleteAllData()
 {
 	// Delete all WorkQueues.
 	POSITION pos = WorkQueueMap.GetStartPosition();
@@ -316,7 +316,7 @@ void CSimulator::DeleteAllData()
 	ContentInfoMap.RemoveAll();
 }
 
-bool CSimulator::SimulateOneStep()
+bool CSimulatorIn::SimulateOneStep()
 {
 	if(WorkQueueMap.GetCount() == 0)
 	{

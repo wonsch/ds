@@ -4,7 +4,7 @@
 #include "PeerInfo.h"
 #include "ContentInfo.h"
 
-CWorkSendMessage::CWorkSendMessage(CSimulator *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID) : CWorkMessageBase(Simulator, SrcPeerID, DstPeerID)
+CWorkSendMessage::CWorkSendMessage(CSimulatorIn *Simulator, unsigned int SrcPeerID, unsigned int DstPeerID) : CWorkMessageBase(Simulator, SrcPeerID, DstPeerID)
 {
 	DontIncreaseWorkNumber = true;
 }
@@ -32,11 +32,11 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 			LogPT+= sprintf(LogPT, ", Message = NotifyNull");
 
 			// Dump
-			Dump+= sprintf(Dump, "ETYPE=NOTIFY_NULL\n");
+			Dump+= sprintf(Dump, "ETYPE=SEND_NOTIFY_NULL\n");
 			//Dump+= sprintf(Dump, "EDETAIL=\n");
 			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
 			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
-			Dump+= sprintf(Dump, "ENOTE=Peer %u notify peer %u.\n", SrcPeerID, DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=Peer %u sends a notify message to peer %u.\n", SrcPeerID, DstPeerID);
 		}
 		break;
 
@@ -48,7 +48,7 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 			for(POSITION pos = Message->FloodPath.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->FloodPath.GetNext(pos));
 
 			// Dump
-			Dump+= sprintf(Dump, "ETYPE=SEARCH_CONTENT\n");
+			Dump+= sprintf(Dump, "ETYPE=SEND_SEARCH_CONTENT\n");
 			//Dump+= sprintf(Dump, "EDETAIL=\n");
 			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
 			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
@@ -79,7 +79,7 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 			for(POSITION pos = Message->FloodPath.GetHeadPosition();pos != NULL;) LogPT+= sprintf(LogPT, " %u", Message->FloodPath.GetNext(pos));
 
 			// Dump
-			Dump+= sprintf(Dump, "ETYPE=SEARCH_CONTENT_RESPONSE_PATH\n");
+			Dump+= sprintf(Dump, "ETYPE=SEND_SEARCH_CONTENT_RESPONSE_PATH\n");
 			//Dump+= sprintf(Dump, "EDETAIL=\n");
 			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
 			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
@@ -90,6 +90,13 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 	case EMESSAGE_ASK_GROUPING:
 		{
 			LogPT+= sprintf(LogPT, ", Message = AskGrouping");
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=SEND_ASK_GROUPING\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=\n");
 		}
 		break;
 

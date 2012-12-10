@@ -5,7 +5,7 @@
 class CWorkSearchContent : public CWorkBase
 {
 public:
-	CWorkSearchContent(CSimulator *Simulator, unsigned int PeerID, unsigned int ContentID);
+	CWorkSearchContent(CSimulatorIn *Simulator, unsigned int PeerID, unsigned int ContentID);
 	~CWorkSearchContent();
 
 	virtual	void								Simulate(char *Log, char *Dump);

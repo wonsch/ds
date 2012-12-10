@@ -5,7 +5,7 @@
 #include "PeerInfo.h"
 #include "ContentInfo.h"
 
-CWorkInsertPeer::CWorkInsertPeer(CSimulator *Simulator) : CWorkBase(Simulator)
+CWorkInsertPeer::CWorkInsertPeer(CSimulatorIn *Simulator) : CWorkBase(Simulator)
 {
 }
 

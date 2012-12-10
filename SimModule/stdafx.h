@@ -12,3 +12,7 @@
 #include <conio.h>
 #include "wLock.h"
 #include "wRand.h"
+
+#ifdef DEBUG_NEW
+#define new DEBUG_NEW
+#endif

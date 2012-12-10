@@ -1,17 +1,17 @@
 #pragma once
 
-#include "Simulator.h"
+#include "SimulatorIn.h"
 
 class CWorkBase
 {
 public:
 	CWorkBase();
-	CWorkBase(CSimulator *Simulator);
+	CWorkBase(CSimulatorIn *Simulator);
 	virtual ~CWorkBase();
 
 	virtual	void								Simulate(char *Log, char *Dump);
 
 	CWorkBase*									NextLink;
-	CSimulator*									Sim;
+	CSimulatorIn*								Sim;
 	bool										DontIncreaseWorkNumber;
 };
