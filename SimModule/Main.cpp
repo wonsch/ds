@@ -5,9 +5,10 @@
 
 #define SIMULATOR_THREAD_COUNT					3
 //#define DUMP
-#define PEER_COUNT								10000
-#define GROUP_SIZE								100
-#define SEARCH_CONTENT_COUNT					1
+#define PEER_COUNT								200
+#define GROUP_SIZE								10
+#define SEARCH_CONTENT_COUNT					2
+#define CONTENT_INFO_FLOOD_TTL					1
 
 CwLock PrintLock;
 int PrintTurn = 1;
@@ -27,11 +28,11 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		unsigned int RandomSeed = GetTickCount();
 		//for(int i = 0;i < 3;i++)
 		{
-			//Sim.Reset(RandomSeed);
-			Sim.Reset(0);
+			Sim.Reset(RandomSeed);
+			//Sim.Reset(0);
 			
 			Sim.SetEnvironmentRandomly();
-			Sim.SetGroupMaxMemeberNumber(GROUP_SIZE); //jin
+
 			switch(ThreadID)
 			{
 			case 1:
@@ -42,6 +43,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 				break;
 			case 3:
 				Sim.SetMode(MODE_CACHE_ON, MODE_GROUPING_ON);
+				Sim.SetGroupMaxMemeberNumber(GROUP_SIZE); //jin
+				Sim.SetContentInfoFloodingTTL(CONTENT_INFO_FLOOD_TTL); //jin
 				break;
 			}
 #ifdef DUMP
@@ -56,6 +59,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			CContentInfo *ContentInfo = Sim.GetRandomContent();
 			for(int j = 0;j < SEARCH_CONTENT_COUNT;j++)
 			{
+				//if(ThreadID == 3) Sim.SetVerbose(true);
+
 				Sim.InsertWorkSearchContent(Sim.Step + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
 				Sim.SimulateToInfinity();
 			}

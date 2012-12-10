@@ -83,13 +83,53 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 }
 
 /*====================jin=========================*/
-
 int CWorkRecvMessage::MessageUpdateContentInfo(char *Log, char *Dump)
 {
 	char* LogPT = Log;
 	LogPT+= sprintf(LogPT, ", Message = UpdateContentInfo");
-
 	this->DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->ContentPeerID);
+	if(Message->TTL != 0)
+	{
+		
+		CWorkQueue WorkQueue;
+		POSITION pos2 = DstPeerInfo->GroupPeerIDMap.GetStartPosition();
+		bool diff = true;
+
+		while(pos2 != NULL)
+		{
+			unsigned int GroupPeerID;
+			void *temp2;
+			DstPeerInfo->GroupPeerIDMap.GetNextAssoc(pos2, GroupPeerID, temp2);
+			POSITION pos = DstPeerInfo->NeighborPeerIDMap.GetStartPosition();
+			while(pos != NULL)
+			{
+				unsigned int NeighborPeerID;
+				void *Temp;
+				DstPeerInfo->NeighborPeerIDMap.GetNextAssoc(pos, NeighborPeerID, Temp);
+				if(GroupPeerID == NeighborPeerID)
+				{
+					diff = false;
+				}
+
+			}
+			if(diff)
+			{
+				CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, GroupPeerID);
+				WorkSendMessage->Message = new CMessage(Message->MessageID);
+				WorkSendMessage->Message->SetContentInfoUpdate(Message->ContentID, Message->FromPeerID, Message->TTL -1);
+				WorkQueue.QueueAtTail(WorkSendMessage);
+				LogPT+= sprintf(LogPT, " %u, TTL = %d", GroupPeerID,Message->TTL);
+
+
+			}
+			else
+			{
+				diff = true;
+			}
+		}
+		Sim->InsertWork(Sim->Step, &WorkQueue, true);
+		WorkQueue.RemoveAll();
+	}
 
 	return LogPT - Log;
 }
@@ -431,7 +471,7 @@ int CWorkRecvMessage::MessageSearchContentResponsePath(char *Log, char *Dump)
 			{
 				CWorkSendMessage *WorkSendMessage = new CWorkSendMessage(Sim, DstPeerID, GroupPeerID);
 				WorkSendMessage->Message = new CMessage(Message->MessageID);
-				WorkSendMessage->Message->SetContentInfoUpdate(Message->ContentID, Message->FromPeerID);
+				WorkSendMessage->Message->SetContentInfoUpdate(Message->ContentID, Message->FromPeerID,Sim->TTLContentInfo);
 				WorkQueue.QueueAtTail(WorkSendMessage);
 				LogPT+= sprintf(LogPT, " %u", GroupPeerID);
 

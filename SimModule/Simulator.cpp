@@ -23,6 +23,10 @@ CSimulator::~CSimulator()
 }
 
 /*=====================JIN=======================*/
+void CSimulator::SetContentInfoFloodingTTL(int ttl)
+{
+	TTLContentInfo = ttl;
+}
 void CSimulator::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
 {
 	GroupMaxNumber = MaxNumber;

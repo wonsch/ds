@@ -61,7 +61,8 @@ public:
 	/*   JIN    */
 
 	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
-
+	void										SetContentInfoFloodingTTL( int ttl);
+	int											TTLContentInfo;
 	unsigned int								GroupMaxNumber;
 	ECacheMode									CacheMode;
 	EGroupMode									GroupMode;
