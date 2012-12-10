@@ -41,6 +41,9 @@ void CSimulatorIn::SetMode(ECacheMode CacheMode, EGroupMode GroupMode)
 
 void CSimulatorIn::Reset(unsigned long RandomSeed)
 {
+	// Free all allocated memory
+	DeleteAllData();
+
 	CacheMode = MODE_CACHE_OFF;
 	GroupMode = MODE_GROUPING_OFF;
 
@@ -57,9 +60,6 @@ void CSimulatorIn::Reset(unsigned long RandomSeed)
 	StatisticsTotalSearchContentSuccessCount = 0;
 	StatisticsTotalSearchContentHopCount = 0;
 	StatisticsTotalMessageCount = 0;
-
-	// Free all allocated memory
-	DeleteAllData();
 
 	// Set environment to default 
 	SetEnvironmentDefault();

@@ -2,10 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="SimModule"
-	ProjectGUID="{1FA69AB5-6196-474E-AA70-07FC38D84DB2}"
-	RootNamespace="SimModule"
-	Keyword="Win32Proj"
+	Name="Sim"
+	ProjectGUID="{6E21839D-54EA-4917-81DB-F1FA5EDF1F85}"
+	RootNamespace="Sim"
+	Keyword="MFCProj"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -38,16 +38,18 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="false"
+				ValidateParameters="true"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="DEBUG;SIM_EXPORT"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -56,6 +58,9 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1042"
+				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -65,7 +70,7 @@
 				LinkIncremental="2"
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -113,16 +118,19 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="false"
+				ValidateParameters="true"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="NDEBUG;SIM_EXPORT"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
+				MinimalRebuild="false"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -131,6 +139,9 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1042"
+				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -140,7 +151,7 @@
 				LinkIncremental="1"
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -172,102 +183,26 @@
 	</References>
 	<Files>
 		<Filter
-			Name="2 Work"
+			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\WorkBase.cpp"
+				RelativePath=".\LogDlg.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\WorkBase.h"
+				RelativePath=".\MainDlg.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\WorkInsertPeer.cpp"
+				RelativePath=".\Sim.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\WorkInsertPeer.h"
+				RelativePath=".\SimDlg.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\WorkMessageBase.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkMessageBase.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkQueue.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkQueue.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkRecvMessage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkRecvMessage.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkSearchContent.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkSearchContent.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkSendMessage.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WorkSendMessage.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="0 Main"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\Main.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="1 Simulator"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\SimulatorEx.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SimulatorEx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SimulatorIn.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SimulatorIn.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="9 ETC"
-			>
 			<File
 				RelativePath=".\stdafx.cpp"
 				>
@@ -288,12 +223,50 @@
 					/>
 				</FileConfiguration>
 			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath="..\SimModule\ContentInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LogDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MainDlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SimModule\PeerInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Sim.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SimDlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SimModule\SimulatorEx.h"
+				>
+			</File>
 			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath=".\wLock.h"
+				RelativePath=".\targetver.h"
 				>
 			</File>
 			<File
@@ -302,34 +275,28 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="3 Data Structure"
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\ContentInfo.cpp"
+				RelativePath=".\res\Sim.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\ContentInfo.h"
+				RelativePath=".\Sim.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\Message.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Message.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PeerInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PeerInfo.h"
+				RelativePath=".\res\Sim.rc2"
 				>
 			</File>
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="Sim.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

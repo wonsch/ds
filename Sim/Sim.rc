@@ -1,0 +1,209 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Korean resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+#ifdef _WIN32
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)\r\n"
+    "LANGUAGE 18, 1\r\n"
+    "#pragma code_page(949)\r\n"
+    "#include ""res\\Sim.rc2""  // Microsoft Visual C++ AI¿UAC ´U¸￥ μμ±¸¿¡¼­ ÆiAyCN ¸®¼O½ºAO´I´U.\r\n"
+    "#include ""l.KOR\\afxres.rc""      // C￥AØ ±¸¼º ¿a¼OAO´I´U.\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\Sim.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SIM_DIALOG DIALOGEX 0, 0, 500, 360
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Team B Simulator"
+FONT 9, "굴림체", 400, 0, 0x81
+BEGIN
+    CONTROL         "",IDC_TAB,"SysTabControl32",0x0,0,0,500,360
+END
+
+IDD_MAIN_DIALOG DIALOGEX 0, 0, 494, 341
+STYLE DS_SETFONT | WS_CHILD
+FONT 9, "굴림체", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "Settings",IDC_SETTINGS,0,0,493,67
+    RTEXT           "RandomSeed :",IDC_STATIC,6,16,49,8
+    EDITTEXT        IDC_SETTING_RANDOMSEED,58,14,60,12,ES_CENTER | ES_NUMBER
+    PUSHBUTTON      "Reset",IDC_RESET,6,30,112,30
+    CONTROL         "CACHE_OFF",IDC_SETTING_CACHE,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,127,13,112,22
+    CONTROL         "GROUP_OFF",IDC_SETTING_GROUP,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,127,38,112,22
+    RTEXT           "PeerCount :",IDC_STATIC,283,16,45,8
+    EDITTEXT        IDC_SETTING_PEERCOUNT,331,14,60,12,ES_CENTER | ES_NUMBER
+    RTEXT           "SearchContentCount :",IDC_STATIC,247,32,81,8
+    EDITTEXT        IDC_SETTING_SEARCHCONTENTCOUNT,331,30,60,12,ES_CENTER | ES_NUMBER
+    RTEXT           "GroupSize :",IDC_STATIC,283,48,45,8
+    EDITTEXT        IDC_SETTING_GROUPSIZE,331,46,60,12,ES_CENTER | ES_NUMBER
+    PUSHBUTTON      "Start",IDC_SETTING_START,400,12,86,48
+    LTEXT           "Statistics",IDC_STATIC,4,74,41,8
+    EDITTEXT        IDC_STATISTICS,0,84,493,257,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+END
+
+IDD_LOG_DIALOG DIALOGEX 0, 0, 494, 341
+STYLE DS_SETFONT | WS_CHILD
+FONT 9, "굴림체", 400, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_LOG,0,0,493,341,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041203b5"
+        BEGIN
+            VALUE "CompanyName", "TODO: <회사 이름>"
+            VALUE "FileDescription", "TODO: <파일 설명>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "Sim.exe"
+            VALUE "LegalCopyright", "TODO: (c) <회사 이름>.  All rights reserved."
+            VALUE "OriginalFilename", "Sim.exe"
+            VALUE "ProductName", "TODO: <제품 이름>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 949
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SIM_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 320
+        BOTTOMMARGIN, 200
+    END
+
+    IDD_MAIN_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 493
+        BOTTOMMARGIN, 340
+    END
+
+    IDD_LOG_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 493
+        BOTTOMMARGIN, 340
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Korean resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE 18, 1
+#pragma code_page(949)
+#include "res\Sim.rc2"  // Microsoft Visual C++ 이외의 다른 도구에서 편집한 리소스입니다.
+#include "l.KOR\afxres.rc"      // 표준 구성 요소입니다.
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
