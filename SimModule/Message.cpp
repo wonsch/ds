@@ -19,10 +19,10 @@ void CMessage::SetNotifyNull()
 }
 /*========================JIN==================================*/
 
-void CMessage::SetContentInfoUpdate(unsigned int PeerID, unsigned contentID,int ttl)
+void CMessage::SetContentInfoUpdate(unsigned int PeerID, unsigned int ContentID, int ttl)
 {
 	Message = EMESSAGE_CONTENT_INFO_UPDATE;
-	this->ContentID = contentID;
+	this->ContentID = ContentID;
 	this->ContentPeerID = PeerID;
 	this->TTL = ttl;
 }

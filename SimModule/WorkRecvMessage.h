@@ -26,4 +26,6 @@ private:
 	int											MessageNotifyGrouping(char *Log, char *Dump);
 	int											MessageTryAsking(char *Log, char *Dump);
 	int											MessageUpdateContentInfo(char *Log, char *Dump);
+
+	void										SendContentInfoUpdate(int TTL);
 };

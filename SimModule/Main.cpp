@@ -5,13 +5,15 @@
 
 #define SIMULATOR_THREAD_COUNT					3
 //#define DUMP
-#define PEER_COUNT								200
+#define PEER_COUNT								10000
 #define GROUP_SIZE								10
-#define SEARCH_CONTENT_COUNT					2
-#define CONTENT_INFO_FLOOD_TTL					1
+#define GROUP_COUNT								((PEER_COUNT + (GROUP_SIZE - 1)) / GROUP_SIZE)
+#define SEARCH_CONTENT_COUNT					10
+#define CONTENT_INFO_FLOOD_TTL					GROUP_COUNT
 
 CwLock PrintLock;
 int PrintTurn = 1;
+unsigned int GlobalRandomSeed;
 DWORD LastThreadPrintTime = 0;
 bool IsFirstSimulation = true;
 
@@ -22,10 +24,10 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 	CSimulator Sim;
 	Sim.SetVerbose(false);
 
-	//for(unsigned int RandomSeed = 0;;RandomSeed++)
-	while(true)
+	for(unsigned int RandomSeed = GlobalRandomSeed;;RandomSeed++)
+	//while(true)
 	{
-		unsigned int RandomSeed = GetTickCount();
+		//unsigned int RandomSeed = GetTickCount();
 		//for(int i = 0;i < 3;i++)
 		{
 			Sim.Reset(RandomSeed);
@@ -51,6 +53,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			Sim.DumpOpen();
 #endif
 
+			DWORD StartTime = GetTickCount();
+
 			// Insert peers
 			for(int j = 0;j < PEER_COUNT / 5;j++) Sim.InsertWorkInsertPeer(j + 1, 5);
 			Sim.SimulateToInfinity();
@@ -64,6 +68,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 				Sim.InsertWorkSearchContent(Sim.Step + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
 				Sim.SimulateToInfinity();
 			}
+
+			DWORD EndTime = GetTickCount();
 
 			// Result Print
 			while(PrintTurn != ThreadID) Sleep(1);
@@ -89,7 +95,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 				}
 
 				printf("================================ Thread %u ================================\n", ThreadID);
-				printf("*** Simulation is terminated at step %u\n", Sim.Step);
+				printf("*** Simulation is terminated at step %u (%.1fs)\n", Sim.Step, (double)(EndTime - StartTime) / 1000);
 				printf("*** Simulation Statistics\n");
 				printf("%s", Sim.GetStatistics());
 
@@ -155,6 +161,8 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 
 int main()
 {
+	GlobalRandomSeed = GetTickCount();
+
 	// Create simulator threads
 	for(int i = 0;i < SIMULATOR_THREAD_COUNT;i++)
 	{

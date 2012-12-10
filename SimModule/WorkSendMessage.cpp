@@ -119,7 +119,7 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 
 	case EMESSAGE_CONTENT_INFO_UPDATE:
 		{
-			LogPT+= sprintf(LogPT, ", Message = ContentInfoUpdate");
+			LogPT+= sprintf(LogPT, ", Message = ContentInfoUpdate, TTL = %u", Message->TTL);
 		}
 		break;
 	}

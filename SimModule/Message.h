@@ -50,7 +50,7 @@ public:
 	void										SetAskGroupReject();
 	void										SetTryAsking();
 	//void										SetContentInfoFlooding();
-	void										SetContentInfoUpdate(unsigned int ContentPeerID, unsigned contentID,int ttl);
+	void										SetContentInfoUpdate(unsigned int PeerID, unsigned int ContentID, int ttl);
 	unsigned int								GroupID; 
 	unsigned int								GroupMemberNumber;
 	CAtlList<unsigned int>						GroupMemberID;

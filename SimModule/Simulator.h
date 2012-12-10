@@ -2,7 +2,7 @@
 
 #define SIM_RANDOM_VALUE						-1
 #define SIM_RANDOM_NEIGHBOR_RANGE				3
-#define SIM_MAX_FLOOD_HOP_COUNT					5
+#define SIM_MAX_FLOOD_HOP_COUNT					6
 
 class CWorkQueue;
 class CWorkBase;

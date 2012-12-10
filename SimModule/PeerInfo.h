@@ -37,7 +37,7 @@ public:
 	unsigned int groupID;
 	unsigned int currGroupMemberNumber;
 
-	CAtlMap<unsigned int, void*> GroupPeerIDMap; // group peer id
+	CAtlMap<unsigned int, void*> MyGroupPeerIDMap; // my group peer id
 	CAtlMap<unsigned int, void*> OtherGroupPeerIDMap; // other group peer id
 	
 
