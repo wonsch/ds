@@ -3,13 +3,16 @@
 #include "PeerInfo.h"
 #include "ContentInfo.h"
 
-#define SIMULATOR_THREAD_COUNT					1
+#define SIMULATOR_THREAD_COUNT					3
+//#define DUMP
 #define PEER_COUNT								10000
 #define GROUP_SIZE								100
-//#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 1000)
-#define SEARCH_CONTENT_COUNT					5
+#define SEARCH_CONTENT_COUNT					1
 
 CwLock PrintLock;
+int PrintTurn = 1;
+DWORD LastThreadPrintTime = 0;
+bool IsFirstSimulation = true;
 
 DWORD WINAPI SimulatorThread(LPVOID Argument)
 {
@@ -22,26 +25,28 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 	while(true)
 	{
 		unsigned int RandomSeed = GetTickCount();
-		for(int i = 0;i < 3;i++)
+		//for(int i = 0;i < 3;i++)
 		{
-			Sim.Reset(RandomSeed);
-			//Sim.Reset(0);
+			//Sim.Reset(RandomSeed);
+			Sim.Reset(0);
 			
 			Sim.SetEnvironmentRandomly();
 			Sim.SetGroupMaxMemeberNumber(GROUP_SIZE); //jin
-			switch(i)
+			switch(ThreadID)
 			{
-			case 0:
+			case 1:
 				Sim.SetMode(MODE_CACHE_OFF, MODE_GROUPING_OFF);
 				break;
-			case 1:
+			case 2:
 				Sim.SetMode(MODE_CACHE_ON, MODE_GROUPING_OFF);
 				break;
-			case 2:
+			case 3:
 				Sim.SetMode(MODE_CACHE_ON, MODE_GROUPING_ON);
 				break;
 			}
-			//Sim.DumpOpen();
+#ifdef DUMP
+			Sim.DumpOpen();
+#endif
 
 			// Insert peers
 			for(int j = 0;j < PEER_COUNT / 5;j++) Sim.InsertWorkInsertPeer(j + 1, 5);
@@ -55,13 +60,28 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 				Sim.SimulateToInfinity();
 			}
 
-			if(Sim.StatisticsTotalSearchContentSuccessCount == 0) break;
-
 			// Result Print
+			while(PrintTurn != ThreadID) Sleep(1);
+
 			{
 				CwLockAuto PrintLockAuto(&PrintLock);
 
-				if(i == 0) system("cls");
+				if(ThreadID == 1)
+				{
+					if(IsFirstSimulation == false)
+					{
+						printf("\n*** Press any key to see the next simulation. ***\n");
+						_getch();
+					}
+					else IsFirstSimulation = false;
+
+					DWORD Timer = GetTickCount();
+					if(LastThreadPrintTime + 1000 >= Timer)
+					{
+						Sleep(LastThreadPrintTime + 1000 - Timer);
+					}
+					system("cls");
+				}
 
 				printf("================================ Thread %u ================================\n", ThreadID);
 				printf("*** Simulation is terminated at step %u\n", Sim.Step);
@@ -112,9 +132,13 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 					printf(" \n");
 				}*/
 			}
+			if(PrintTurn == SIMULATOR_THREAD_COUNT) LastThreadPrintTime = GetTickCount();
+			PrintTurn = PrintTurn % SIMULATOR_THREAD_COUNT + 1;
 
 			// Final Dump
+#ifdef DUMP
 			Sim.DumpFinal();
+#endif
 		}
 
 		//_getch();

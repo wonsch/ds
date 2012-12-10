@@ -135,6 +135,9 @@ void CSimulator::DumpFinal()
 	fprintf(DumpFile, "\n[SIMULATIONINFO]\n");
 	fprintf(DumpFile, "PEERCOUNT=%u\n", PeerInfoMap.GetCount());
 	fprintf(DumpFile, "CYCLECOUNT=%u\n", Step);
+
+	fclose(DumpFile);
+	DumpFile = NULL;
 }
 
 void CSimulator::DumpPeers()
@@ -248,6 +251,7 @@ CAtlString CSimulator::GetStatistics()
 
 	CAtlString String;
 	String.AppendFormat("RandomSeed : %u\n", InitRandomSeed);
+	String.AppendFormat("CacheMode/GroupMode : %s/%s\n", CacheMode == MODE_CACHE_OFF ? "OFF" : "ON", GroupMode == MODE_GROUPING_OFF ? "OFF" : "ON");
 	String.AppendFormat("Total Peers : %u\n", PeerInfoMap.GetCount());
 	//String.AppendFormat("Total Contents : %u\n", ContentInfoMap.GetCount());
 	String.AppendFormat("Average Number of Contents per Peer : %g\n", (double)ContentInfoMap.GetCount() / PeerInfoMap.GetCount());
