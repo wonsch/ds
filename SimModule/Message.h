@@ -13,6 +13,7 @@ enum EMessage
 	EMESSAGE_NOTIFY_GROUPING,
 	EMESSAGE_TRY_ASKING,
 	EMESSAGE_CONTENT_INFO_UPDATE,
+	
 };
 
 enum EResponseFrom
@@ -48,7 +49,8 @@ public:
 	void										SetAskGrouping();
 	void										SetAskGroupReject();
 	void										SetTryAsking();
-	void										SetContentInfoUpdate(unsigned int ContentPeerID, unsigned contentID);
+	//void										SetContentInfoFlooding();
+	void										SetContentInfoUpdate(unsigned int ContentPeerID, unsigned contentID,int ttl);
 	unsigned int								GroupID; 
 	unsigned int								GroupMemberNumber;
 	CAtlList<unsigned int>						GroupMemberID;
@@ -56,6 +58,7 @@ public:
 
 	//unsigned int								ContentID;
 	unsigned int								ContentPeerID;
+	int											TTL;
 
 	/*========================JIN==================================*/
 

@@ -8,6 +8,7 @@
 #define GROUP_SIZE								100
 //#define SEARCH_CONTENT_COUNT					(PEER_COUNT / 1000)
 #define SEARCH_CONTENT_COUNT					5
+#define CONTENT_INFO_FLOOD_TTL					5
 
 CwLock PrintLock;
 
@@ -29,6 +30,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			
 			Sim.SetEnvironmentRandomly();
 			Sim.SetGroupMaxMemeberNumber(GROUP_SIZE); //jin
+			Sim.SetContentInfoFloodingTTL(CONTENT_INFO_FLOOD_TTL); //jin
 			switch(i)
 			{
 			case 0:
