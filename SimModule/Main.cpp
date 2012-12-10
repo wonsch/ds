@@ -82,19 +82,32 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 					if(IsFirstSimulation == false)
 					{
 						printf("\n*** Press any key to see the next simulation. ***\n");
-						_getch();
+						Sleep(3000);
+						//_getch();
 					}
 					else IsFirstSimulation = false;
 
-					DWORD Timer = GetTickCount();
+					/*DWORD Timer = GetTickCount();
 					if(LastThreadPrintTime + 1000 >= Timer)
 					{
 						Sleep(LastThreadPrintTime + 1000 - Timer);
-					}
+					}*/
 					system("cls");
 				}
 
-				printf("================================ Thread %u ================================\n", ThreadID);
+				switch(ThreadID)
+				{
+				case 1:
+					printf("================================ Pure P2P ================================\n");
+					break;
+				case 2:
+					printf("================================ Key Paper ================================\n");
+					break;
+				case 3:
+					printf("================================ Our Work ================================\n");
+					break;
+				}
+//				printf("================================ Thread %u ================================\n", ThreadID);
 				printf("*** Simulation is terminated at step %u (%.1fs)\n", Sim.Step, (double)(EndTime - StartTime) / 1000);
 				printf("*** Simulation Statistics\n");
 				printf("%s", Sim.GetStatistics());
