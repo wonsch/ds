@@ -12,11 +12,12 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	CSimulatorEx*								Sim;
+	CSimulatorEx								Sim;
 	unsigned int								RandomSeed;
 
 	ECacheMode									CacheMode;
 	EGroupMode									GroupMode;
+	unsigned int								MaxFloodHopCount;
 	unsigned int								PeerCount;
 	unsigned int								SearchContentCount;
 	unsigned int								GroupSize;

@@ -27,6 +27,8 @@ void CMainDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SETTING_SEARCHCONTENTCOUNT, m_Setting_SearchContentCount);
 	DDX_Control(pDX, IDC_SETTING_GROUPSIZE, m_Setting_GroupSize);
 	DDX_Control(pDX, IDC_RESET, m_Setting_Reset);
+	DDX_Control(pDX, IDC_SETTING_MAXFLOODHOPCOUNT, m_Setting_MaxFloodHopCount);
+	DDX_Control(pDX, IDC_STEP, m_Step);
 }
 
 BEGIN_MESSAGE_MAP(CMainDlg, CDialog)
@@ -44,6 +46,8 @@ BOOL CMainDlg::OnInitDialog()
 	char String[32];
 	sprintf(String, "%u", SimApp.RandomSeed);
 	m_Setting_RandomSeed.SetWindowText(String);
+	sprintf(String, "%u", SimApp.MaxFloodHopCount);
+	m_Setting_MaxFloodHopCount.SetWindowText(String);
 	sprintf(String, "%u", SimApp.PeerCount);
 	m_Setting_PeerCount.SetWindowText(String);
 	sprintf(String, "%u", SimApp.SearchContentCount);
@@ -78,7 +82,8 @@ void CMainDlg::OnBnClickedReset()
 	sprintf(String, "%u", SimApp.RandomSeed);
 	m_Setting_RandomSeed.SetWindowText(String);
 
-	m_Statistics.SetWindowText("");
+	m_Step.SetWindowText("Step :");
+	//m_Statistics.SetWindowText("");
 }
 
 void CMainDlg::OnBnClickedSettingCache()
@@ -101,16 +106,19 @@ void CMainDlg::OnBnClickedSettingStart()
 		m_Setting_Reset.EnableWindow(FALSE);
 		m_Setting_Cache.EnableWindow(FALSE);
 		m_Setting_Group.EnableWindow(FALSE);
+		m_Setting_MaxFloodHopCount.EnableWindow(FALSE);
 		m_Setting_PeerCount.EnableWindow(FALSE);
 		m_Setting_SearchContentCount.EnableWindow(FALSE);
 		m_Setting_GroupSize.EnableWindow(FALSE);
-		m_Statistics.SetWindowText("");
+		//m_Statistics.SetWindowText("");
 
 		char String[32];
 		m_Setting_RandomSeed.GetWindowText(String, _countof(String));
 		SimApp.RandomSeed = (unsigned int)atof(String);
 		SimApp.CacheMode = m_Setting_Cache.GetState() & BST_CHECKED ? MODE_CACHE_ON : MODE_CACHE_OFF;
 		SimApp.GroupMode = m_Setting_Group.GetState() & BST_CHECKED ? MODE_GROUPING_ON : MODE_GROUPING_OFF;
+		m_Setting_MaxFloodHopCount.GetWindowText(String, _countof(String));
+		SimApp.MaxFloodHopCount = atoi(String);
 		m_Setting_PeerCount.GetWindowText(String, _countof(String));
 		SimApp.PeerCount = atoi(String);
 		m_Setting_SearchContentCount.GetWindowText(String, _countof(String));
@@ -129,10 +137,25 @@ void CMainDlg::OnBnClickedSettingStart()
 		m_Setting_Reset.EnableWindow(TRUE);
 		m_Setting_Cache.EnableWindow(TRUE);
 		m_Setting_Group.EnableWindow(TRUE);
+		m_Setting_MaxFloodHopCount.EnableWindow(TRUE);
 		m_Setting_PeerCount.EnableWindow(TRUE);
 		m_Setting_SearchContentCount.EnableWindow(TRUE);
 		m_Setting_GroupSize.EnableWindow(TRUE);
 
 		m_Setting_Start.SetWindowText("Start");
+	}
+}
+
+void CMainDlg::SetStep(bool Force, unsigned int Step)
+{
+	static DWORD LastTime = 0;
+	DWORD Timer = GetTickCount();
+	if(Force == true || LastTime + 50 < Timer)
+	{
+		LastTime = Timer;
+
+		char String[32];
+		sprintf(String, "Step : %u", Step);
+		m_Step.SetWindowText(String);
 	}
 }

@@ -8,7 +8,6 @@
 
 #define SIM_RANDOM_VALUE						-1
 #define SIM_RANDOM_NEIGHBOR_RANGE				3
-#define SIM_MAX_FLOOD_HOP_COUNT					6
 
 enum ECacheMode
 {
@@ -58,7 +57,8 @@ public:
 	class CContentInfo*							GetRandomContent();
 
 	/*   JIN    */
-	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
+	void										SetMaxFloodHopCount(unsigned int MaxFloodHopCount);
+	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);
 	void										SetContentInfoFloodingTTL(int TTL);
 	/*   JIN    */
 

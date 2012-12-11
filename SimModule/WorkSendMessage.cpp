@@ -63,7 +63,7 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 			LogPT+= sprintf(LogPT, ", Message = SearchContentResponseSource, FromPeerID = %u, ContentID = %08X, Hops = %u", Message->FromPeerID, Message->ContentID, Message->Hops);
 
 			// Dump
-			Dump+= sprintf(Dump, "ETYPE=SEARCH_CONTENT_RESPONSE_SOURCE\n");
+			Dump+= sprintf(Dump, "ETYPE=SEND_SEARCH_CONTENT_RESPONSE_SOURCE\n");
 			//Dump+= sprintf(Dump, "EDETAIL=\n");
 			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
 			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
@@ -126,7 +126,14 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 
 	case EMESSAGE_CONTENT_INFO_UPDATE:
 		{
-			LogPT+= sprintf(LogPT, ", Message = ContentInfoUpdate, TTL = %u", Message->TTL);
+			LogPT+= sprintf(LogPT, ", Message = ContentInfoUpdate, ContentID = %08X, TTL = %d", Message->ContentID, Message->TTL);
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=SEND_CONTENT_INFO_UPDATE\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ENOTE=ContentID = %08X, TTL = %d\n", Message->ContentID, Message->TTL);
 		}
 		break;
 	}

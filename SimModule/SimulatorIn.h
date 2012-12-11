@@ -46,6 +46,7 @@ public:
 
 	/*   JIN    */
 
+	void										SetMaxFloodHopCount(unsigned int MaxFloodHopCount);
 	void										SetGroupMaxMemeberNumber(unsigned int MaxNumber);					
 	void										SetContentInfoFloodingTTL(int ttl);
 	int											TTLContentInfo;
@@ -87,12 +88,12 @@ public:
 	// Simulation data
 	////////////////////////////////////////////////////////////////
 	unsigned int								Step;
-	CAtlMap<unsigned int, CWorkQueue*>			WorkQueueMap; // Map<Step, WorkQueue>
+	CAtlMap<unsigned int, CWorkQueue*>*			WorkQueueMap; // Map<Step, WorkQueue>
 
 	unsigned int								NewPeerID;
-	CAtlMap<unsigned int, CPeerInfo*>			PeerInfoMap; // Map<PeerID, PeerInfo>
+	CAtlMap<unsigned int, CPeerInfo*>*			PeerInfoMap; // Map<PeerID, PeerInfo>
 
-	CAtlMap<unsigned int, CContentInfo*>		ContentInfoMap; // Map<ContentID, ContentInfo>
+	CAtlMap<unsigned int, CContentInfo*>*		ContentInfoMap; // Map<ContentID, ContentInfo>
 
 	unsigned int								InitRandomSeed;
 	CwRand										wRand;

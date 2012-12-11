@@ -22,8 +22,8 @@ void CMessage::SetNotifyNull()
 void CMessage::SetContentInfoUpdate(unsigned int PeerID, unsigned int ContentID, int ttl)
 {
 	Message = EMESSAGE_CONTENT_INFO_UPDATE;
+	this->FromPeerID = PeerID;
 	this->ContentID = ContentID;
-	this->ContentPeerID = PeerID;
 	this->TTL = ttl;
 }
 void CMessage::SetAskGroupAccept(unsigned int GroupID, unsigned int GroupMemberNumber, CAtlList<unsigned int> *pGroupMemberID)

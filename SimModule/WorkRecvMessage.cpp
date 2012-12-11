@@ -22,7 +22,7 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 	LogPT+= sprintf(LogPT, "    Receive a message. (SrcPeerID = %u, DstPeerID = %u, MessageID = %u", SrcPeerID, DstPeerID, Message->MessageID);
 
 	// Get the destination peer.
-	if(Sim->PeerInfoMap.Lookup(DstPeerID, DstPeerInfo) == true)
+	if(Sim->PeerInfoMap->Lookup(DstPeerID, DstPeerInfo) == true)
 	{
 		switch(Message->Message)
 		{
@@ -58,11 +58,25 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 		case EMESSAGE_SEARCH_CONTENT_RESPONSE_SOURCE:
 			// Response a searching content message to source.
 			LogPT+= MessageSearchContentResponseSource(LogPT, Dump);
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=RECV_SEARCH_CONTENT_RESPONSE_SOURCE\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", SrcPeerID);
+			//Dump+= sprintf(Dump, "ENOTE=\n");
 			break;
 
 		case EMESSAGE_SEARCH_CONTENT_RESPONSE_PATH:
 			// Response a searching content message to peers which is on the flood path.
 			LogPT+= MessageSearchContentResponsePath(LogPT, Dump);
+
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=RECV_SEARCH_CONTENT_RESPONSE_PATH\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", SrcPeerID);
+			//Dump+= sprintf(Dump, "ENOTE=\n");
 			break;
 // JIN==========================================================================
 		case EMESSAGE_ASK_GROUPING:
@@ -95,8 +109,14 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 			break;
 		case EMESSAGE_CONTENT_INFO_UPDATE:
 			LogPT += MessageUpdateContentInfo(LogPT, Dump);
-			break;
 
+			// Dump
+			Dump+= sprintf(Dump, "ETYPE=RECV_CONTENT_INFO_UPDATE\n");
+			//Dump+= sprintf(Dump, "EDETAIL=\n");
+			Dump+= sprintf(Dump, "EACTOR=%u\n", DstPeerID);
+			Dump+= sprintf(Dump, "ETARGET=%u\n", SrcPeerID);
+			Dump+= sprintf(Dump, "ENOTE=\n");
+			break;
 		}
 	}
 
@@ -107,18 +127,18 @@ void CWorkRecvMessage::Simulate(char *Log, char *Dump)
 int CWorkRecvMessage::MessageUpdateContentInfo(char *Log, char *Dump)
 {
 	char* LogPT = Log;
-	LogPT+= sprintf(LogPT, ", Message = UpdateContentInfo, FromPeerID = %u, ContentID = %08X, TTL = %d", Message->ContentPeerID, Message->ContentID, Message->TTL);
+	LogPT+= sprintf(LogPT, ", Message = UpdateContentInfo, FromPeerID = %u, ContentID = %08X, TTL = %d", Message->FromPeerID, Message->ContentID, Message->TTL);
 
 	// 다른 그룹에게 전달을 해야 하는지 확인
 	CAtlList<unsigned int> *PeerIDList = DstPeerInfo->FindContentIDPeerIDList(Message->ContentID);
-	if(PeerIDList != NULL && PeerIDList->Find(Message->ContentPeerID) != NULL)
+	if(PeerIDList != NULL && PeerIDList->Find(Message->FromPeerID) != NULL)
 	{
 		LogPT+= sprintf(LogPT, "\n    Ignored. (Already exists in cache table.");
 		return LogPT - Log;
 	}
 
 	// Insert into my cache table.
-	DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->ContentPeerID);
+	DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->FromPeerID);
 	LogPT+= sprintf(LogPT, "\n    Inserted into cache table. (");
 
 	if(Message->TTL > 0) SendContentInfoUpdate(Message->TTL - 1);
@@ -437,8 +457,13 @@ int CWorkRecvMessage::MessageSearchContentResponsePath(char *Log, char *Dump)
 	// Insert into cache table.
 	if(Sim->CacheMode == MODE_CACHE_ON)
 	{
-		DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->FromPeerID);
-		LogPT+= sprintf(LogPT, "\n    Inserted into cache table. (");
+		CAtlList<unsigned int> *PeerIDList = DstPeerInfo->FindContentIDPeerIDList(Message->ContentID);
+		if(PeerIDList == NULL)
+		{
+			DstPeerInfo->InsertContentIDPeerID(Message->ContentID, Message->FromPeerID);
+			LogPT+= sprintf(LogPT, "\n    Inserted into cache table. (");
+		}
+		else return LogPT - Log;
 	}
 
 	// Get a next backward peer ID.

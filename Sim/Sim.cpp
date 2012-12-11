@@ -20,11 +20,10 @@ BOOL CSimApp::InitInstance()
 	RandomSeed = 2925723681;
 	CacheMode = MODE_CACHE_OFF;
 	GroupMode = MODE_GROUPING_OFF;
+	MaxFloodHopCount = 6;
 	PeerCount = 10000;
 	SearchContentCount = 10;
-	GroupSize = 10;
-
-	Sim = NULL;
+	GroupSize = 8;
 
 	CSimDlg dlg;
 	m_pMainWnd = &dlg;
@@ -35,8 +34,6 @@ BOOL CSimApp::InitInstance()
 	else if (nResponse == IDCANCEL)
 	{
 	}
-
-	if(Sim != NULL) delete Sim;
 
 	return FALSE;
 }

@@ -14,11 +14,12 @@
 #define IDC_SETTING_RANDOMSEED          1006
 #define IDC_SETTING_PEERCOUNT           1008
 #define IDC_SETTING_CACHE               1009
+#define IDC_SETTING_MAXFLOODHOPCOUNT    1010
 #define IDC_SETTING_START               1011
 #define IDC_SETTING_GROUP               1012
 #define IDC_SETTING_SEARCHCONTENTCOUNT  1013
-#define IDC_SETTING_PEERCOUNT3          1014
 #define IDC_SETTING_GROUPSIZE           1014
+#define IDC_STEP                        1015
 
 // Next default values for new objects
 // 
@@ -26,7 +27,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

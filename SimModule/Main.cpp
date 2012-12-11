@@ -42,6 +42,8 @@ public:
 
 	unsigned int								RandomSeed;
 
+	unsigned int								MaxFloodHopCount;
+
 	ECacheMode									CacheMode;
 	EGroupMode									GroupMode;
 
@@ -85,7 +87,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 	int ThreadID = (int)Argument;
 	printf("Thread %u> started.\n", ThreadID);
 
-	CSimulatorEx *Sim;
+	CSimulatorEx Sim;
 	CJob Job;
 	unsigned int JobIndex;
 	while(true)
@@ -98,43 +100,42 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			JobIndex = ++::JobIndex;
 		}
 
-		Sim = new CSimulatorEx();
-
 		// 시뮬레이터 환경 설정
 		unsigned int GroupCount = 0;
 		if(Job.GroupSize > 0) GroupCount = (Job.PeerCount + (Job.GroupSize - 1)) / Job.GroupSize;
-		Sim->Reset(Job.RandomSeed);
-		Sim->SetVerbose(false);
-		Sim->SetEnvironmentRandomly();
-		Sim->SetMode(Job.CacheMode, Job.GroupMode);
+		Sim.Reset(Job.RandomSeed);
+		Sim.SetVerbose(true);
+		Sim.SetEnvironmentRandomly();
+		Sim.SetMaxFloodHopCount(Job.MaxFloodHopCount);
+		Sim.SetMode(Job.CacheMode, Job.GroupMode);
 		if(Job.GroupMode == MODE_GROUPING_ON)
 		{
-			Sim->SetGroupMaxMemeberNumber(Job.GroupSize);
-			Sim->SetContentInfoFloodingTTL(Job.TTL);
+			Sim.SetGroupMaxMemeberNumber(Job.GroupSize);
+			Sim.SetContentInfoFloodingTTL(Job.TTL);
 		}
 
 #ifdef DUMP
-		Sim->DumpOpen();
+		Sim.DumpOpen();
 #endif
 
 		DWORD StartTime = GetTickCount();
 
 		// 피어 삽입
-		for(unsigned int i = 0;i < Job.PeerCount / 5;i++) Sim->InsertWorkInsertPeer(i + 1, 5);
-		Sim->SimulateToInfinity();
+		for(unsigned int i = 0;i < Job.PeerCount / 5;i++) Sim.InsertWorkInsertPeer(i + 1, 5);
+		Sim.SimulateToInfinity();
 
 		// 컨텐트 찾기
-		CContentInfo *ContentInfo = Sim->GetRandomContent();
+		CContentInfo *ContentInfo = Sim.GetRandomContent();
 		for(unsigned int i = 0;i < Job.SearchContentCount;i++)
 		{
-			Sim->InsertWorkSearchContent(Sim->GetStep() + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
-			Sim->SimulateToInfinity();
+			Sim.InsertWorkSearchContent(Sim.GetStep() + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
+			Sim.SimulateToInfinity();
 		}
 
 		DWORD EndTime = GetTickCount();
 
 #ifdef DUMP
-		Sim->DumpFinal();
+		Sim.DumpFinal();
 #endif
 
 		// 로그 출력
@@ -146,12 +147,12 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		FILE *File = fopen(FileName, "w");
 		if(File != NULL)
 		{
-			fprintf(File, "*** Simulation is terminated at step %u\n\n", Sim->GetStep());
+			fprintf(File, "*** Simulation is terminated at step %u\n\n", Sim.GetStep());
 			fprintf(File, "*** Simulation Statistics\n");
-			fprintf(File, "%s\n", Sim->GetStatistics());
+			fprintf(File, "%s\n", Sim.GetStatistics());
 
 			fprintf(File, "*** Simulation Output\n");
-			fprintf(File, "%s\n", Sim->GetLog());
+			fprintf(File, "%s\n", Sim.GetLog());
 
 			fclose(File);
 		}*/
@@ -160,10 +161,10 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		{
 			CwLockAuto StatisticsLockAuto(&StatisticsLock[Job.JobKind][Job.PeerKind]);
 			Statistics[Job.JobKind][Job.PeerKind].TotalUpdated++;
-			Statistics[Job.JobKind][Job.PeerKind].TotalMessageCount+= Sim->GetStatisticsTotalMessageCount();
-			Statistics[Job.JobKind][Job.PeerKind].TotalSuccess+= Sim->GetStatisticsTotalSearchContentSuccessCount();
-			Statistics[Job.JobKind][Job.PeerKind].TotalFailure+= Sim->GetStatisticsTotalSearchContentCount() - Sim->GetStatisticsTotalSearchContentSuccessCount();
-			Statistics[Job.JobKind][Job.PeerKind].TotalHops+= Sim->GetStatisticsTotalSearchContentHopCount();
+			Statistics[Job.JobKind][Job.PeerKind].TotalMessageCount+= Sim.GetStatisticsTotalMessageCount();
+			Statistics[Job.JobKind][Job.PeerKind].TotalSuccess+= Sim.GetStatisticsTotalSearchContentSuccessCount();
+			Statistics[Job.JobKind][Job.PeerKind].TotalFailure+= Sim.GetStatisticsTotalSearchContentCount() - Sim.GetStatisticsTotalSearchContentSuccessCount();
+			Statistics[Job.JobKind][Job.PeerKind].TotalHops+= Sim.GetStatisticsTotalSearchContentHopCount();
 
 			if(Statistics[Job.JobKind][Job.PeerKind].TotalUpdated == RepeatCount)
 			{
@@ -182,8 +183,6 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 				}
 			}
 		}
-
-		delete Sim;
 	}
 
 	printf("Thread %u> terminated.\n", ThreadID);
@@ -198,23 +197,55 @@ int main()
 	//GlobalRandomSeed = GetTickCount();
 
 	//unsigned int RandomSeed = GetTickCount();
-	unsigned int RandomSeed = 0;
+	unsigned int RandomSeed = 1;
 
 	CJob Job;
 
 	// For 상일
-	/*Job.Reset();
+	Job.Reset();
+	Job.JobKind = 0;
+	Job.PeerKind = 0;
+	Job.RepeatIndex = 1;
 	Job.RandomSeed = RandomSeed;
-	Job.Index = 1;
+	Job.MaxFloodHopCount = 6;
 	Job.CacheMode = MODE_CACHE_OFF;
 	Job.GroupMode = MODE_GROUPING_OFF;
 	Job.PeerCount = 100;
-	Job.SearchContentCount = 10;
-	Job.GroupSize = 10;
+	Job.SearchContentCount = 1;
+	Job.GroupSize = 8;
+	Job.TTL = Job.MaxFloodHopCount;
+	JobList.AddTail(Job);
+
+	/*Job.Reset();
+	Job.JobKind = 0;
+	Job.PeerKind = 0;
+	Job.RepeatIndex = 1;
+	Job.RandomSeed = RandomSeed;
+	Job.MaxFloodHopCount = 6;
+	Job.CacheMode = MODE_CACHE_ON;
+	Job.GroupMode = MODE_GROUPING_OFF;
+	Job.PeerCount = 300;
+	Job.SearchContentCount = 4;
+	Job.GroupSize = 8;
+	Job.TTL = Job.MaxFloodHopCount;
+	JobList.AddTail(Job);
+
+	Job.Reset();
+	Job.JobKind = 0;
+	Job.PeerKind = 0;
+	Job.RepeatIndex = 1;
+	Job.RandomSeed = RandomSeed;
+	Job.MaxFloodHopCount = 6;
+	Job.CacheMode = MODE_CACHE_ON;
+	Job.GroupMode = MODE_GROUPING_ON;
+	Job.PeerCount = 300;
+	Job.SearchContentCount = 4;
+	Job.GroupSize = 8;
+	Job.TTL = Job.MaxFloodHopCount;
 	JobList.AddTail(Job);*/
 
 	// For 광의
-	CreateDirectory("Statistics", NULL);
+	/*CreateDirectory("Statistics", NULL);
 	for(int Repeat = 0;Repeat < RepeatCount;Repeat++)
 	{
 		for(int i = 0;i < _countof(PeerCounts);i++)
@@ -225,10 +256,11 @@ int main()
 			Job.PeerKind = i;
 			Job.RepeatIndex = Repeat + 1;
 			Job.RandomSeed = RandomSeed + Repeat;
+			Job.MaxFloodHopCount = 6;
 			Job.CacheMode = MODE_CACHE_OFF;
 			Job.GroupMode = MODE_GROUPING_OFF;
 			Job.PeerCount = PeerCounts[i];
-			Job.SearchContentCount = 2;
+			Job.SearchContentCount = 10;
 			JobList.AddTail(Job);
 
 			// Key Paper
@@ -237,10 +269,11 @@ int main()
 			Job.PeerKind = i;
 			Job.RepeatIndex = Repeat + 1;
 			Job.RandomSeed = RandomSeed + Repeat;
+			Job.MaxFloodHopCount = 6;
 			Job.CacheMode = MODE_CACHE_ON;
 			Job.GroupMode = MODE_GROUPING_OFF;
 			Job.PeerCount = PeerCounts[i];
-			Job.SearchContentCount = 2;
+			Job.SearchContentCount = 10;
 			JobList.AddTail(Job);
 
 			// Our Work
@@ -249,15 +282,16 @@ int main()
 			Job.PeerKind = i;
 			Job.RepeatIndex = Repeat + 1;
 			Job.RandomSeed = RandomSeed + Repeat;
+			Job.MaxFloodHopCount = 6;
 			Job.CacheMode = MODE_CACHE_ON;
 			Job.GroupMode = MODE_GROUPING_ON;
 			Job.PeerCount = PeerCounts[i];
-			Job.SearchContentCount = 2;
-			Job.GroupSize = 10;
-			Job.TTL = 6;
+			Job.SearchContentCount = 10;
+			Job.GroupSize = 8;
+			Job.TTL = Job.MaxFloodHopCount;
 			JobList.AddTail(Job);
 		}
-	}
+	}*/
 	JobTotal = JobList.GetCount();
 
 	DWORD StartTime = GetTickCount();
@@ -277,6 +311,8 @@ int main()
 	DWORD EndTime = GetTickCount();
 
 	printf("\nSimulation is finished. <%.1fsec>\n", (EndTime - StartTime) / 1000.0);
+
+	//_getch();
 
 	//while(true) Sleep(1000);
 

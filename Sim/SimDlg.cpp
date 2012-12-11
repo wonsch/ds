@@ -14,42 +14,59 @@ DWORD CSimDlg::SimulateThread(LPVOID Argument)
 {
 	CSimDlg *SD = (CSimDlg *)Argument;
 
-	if(SimApp.Sim != NULL) delete SimApp.Sim;
-	SimApp.Sim = new CSimulatorEx();
+	/*if(SimApp.Sim != NULL) delete SimApp.Sim;
+	SimApp.Sim = new CSimulatorEx();*/
 
-	SimApp.Sim->Reset(SimApp.RandomSeed);
-	SimApp.Sim->SetVerbose(false);
-	SimApp.Sim->SetEnvironmentRandomly();
-	SimApp.Sim->SetMode(SimApp.CacheMode, SimApp.GroupMode);
+	SimApp.Sim.Reset(SimApp.RandomSeed);
+	SimApp.Sim.SetVerbose(false);
+	SimApp.Sim.SetEnvironmentRandomly();
+	SimApp.Sim.SetMaxFloodHopCount(SimApp.MaxFloodHopCount);
+	SimApp.Sim.SetMode(SimApp.CacheMode, SimApp.GroupMode);
 	if(SimApp.GroupMode == MODE_GROUPING_ON)
 	{
-		SimApp.Sim->SetGroupMaxMemeberNumber(SimApp.GroupSize);
-		SimApp.Sim->SetContentInfoFloodingTTL(SIM_MAX_FLOOD_HOP_COUNT);
+		SimApp.Sim.SetGroupMaxMemeberNumber(SimApp.GroupSize);
+		SimApp.Sim.SetContentInfoFloodingTTL(SimApp.MaxFloodHopCount);
 	}
 
 	DWORD StartTime = GetTickCount();
 
 	// ÇÇ¾î »ðÀÔ
-	for(unsigned int i = 0;i < SimApp.PeerCount / 5;i++) SimApp.Sim->InsertWorkInsertPeer(i + 1, 5);
-	SimApp.Sim->SimulateToInfinity();
+	for(unsigned int i = 0;i < SimApp.PeerCount / 5;i++) SimApp.Sim.InsertWorkInsertPeer(i + 1, 5);
+	unsigned int OldStep = SimApp.Sim.GetStep(), NewStep = OldStep;
+	while(true)
+	{
+		SimApp.Sim.SimulateCount(1);
+		NewStep = SimApp.Sim.GetStep();
+		SD->m_MainDlg->SetStep(false, NewStep);
+		if(NewStep == OldStep) break;
+		OldStep = NewStep;
+	}
 
 	// ÄÁÅÙÆ® Ã£±â
-	CContentInfo *ContentInfo = SimApp.Sim->GetRandomContent();
+	CContentInfo *ContentInfo = SimApp.Sim.GetRandomContent();
 	for(unsigned int i = 0;i < SimApp.SearchContentCount;i++)
 	{
-		SimApp.Sim->InsertWorkSearchContent(SimApp.Sim->GetStep() + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
-		SimApp.Sim->SimulateToInfinity();
+		SimApp.Sim.InsertWorkSearchContent(SimApp.Sim.GetStep() + 1, SIM_RANDOM_VALUE, ContentInfo->ContentID);
+		while(true)
+		{
+			SimApp.Sim.SimulateCount(1);
+			NewStep = SimApp.Sim.GetStep();
+			SD->m_MainDlg->SetStep(false, NewStep);
+			if(NewStep == OldStep) break;
+			OldStep = NewStep;
+		}
 	}
+	SD->m_MainDlg->SetStep(true, NewStep);
 
 	DWORD EndTime = GetTickCount();
 
 	CAtlString String;
-	String.AppendFormat("*** Simulation is terminated at step %u\r\n\r\n", SimApp.Sim->GetStep());
+	String.AppendFormat("*** Simulation is terminated at step %u\r\n\r\n", SimApp.Sim.GetStep());
 	String.AppendFormat("*** Simulation Statistics\r\n");
-	String.AppendFormat("%s\r\n", SimApp.Sim->GetStatistics());
+	String.AppendFormat("%s\r\n", SimApp.Sim.GetStatistics());
 
 	String.AppendFormat("*** Simulation Output\r\n");
-	String.AppendFormat("%s\r\n", SimApp.Sim->GetLog());
+	String.AppendFormat("%s\r\n", SimApp.Sim.GetLog());
 
 	SD->m_MainDlg->m_Statistics.SetWindowText(String);
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "afxwin.h"
 
 class CMainDlg : public CDialog
 {
@@ -23,6 +22,7 @@ public:
 	afx_msg void								OnBnClickedSettingCache();
 	afx_msg void								OnBnClickedSettingGroup();
 	afx_msg void								OnBnClickedSettingStart();
+	void										SetStep(bool Force, unsigned int Step);
 
 	class CSimDlg*								m_SimDlg;
 	CStatic										m_Settings;
@@ -30,9 +30,11 @@ public:
 	CButton										m_Setting_Reset;
 	CButton										m_Setting_Cache;
 	CButton										m_Setting_Group;
+	CEdit										m_Setting_MaxFloodHopCount;
 	CEdit										m_Setting_PeerCount;
 	CEdit										m_Setting_SearchContentCount;
 	CEdit										m_Setting_GroupSize;
 	CButton										m_Setting_Start;
+	CStatic										m_Step;
 	CEdit										m_Statistics;
 };

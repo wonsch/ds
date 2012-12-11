@@ -28,7 +28,7 @@ void CWorkInsertPeer::Simulate(char *Log, char *Dump)
 
 	// Set neighbor peers.
 	// This is not optimal.
-	if(Sim->PeerInfoMap.GetCount() > 0)
+	if(Sim->PeerInfoMap->GetCount() > 0)
 	{
 		unsigned int NeighborPeerCount;
 		if(Sim->InitNeighborPeerCount == SIM_RANDOM_VALUE)
@@ -38,10 +38,10 @@ void CWorkInsertPeer::Simulate(char *Log, char *Dump)
 		}
 		else NeighborPeerCount = Sim->InitNeighborPeerCount;
 
-		unsigned int StartIndex = Sim->wRand() % Sim->PeerInfoMap.GetCount();
-		POSITION pos = Sim->PeerInfoMap.GetStartPosition();
-		for(unsigned int j = 0;j < StartIndex;j++) Sim->PeerInfoMap.GetNext(pos);
-		unsigned int StartPeerID = Sim->PeerInfoMap.GetKeyAt(pos), PeerID = StartPeerID;
+		unsigned int StartIndex = Sim->wRand() % Sim->PeerInfoMap->GetCount();
+		POSITION pos = Sim->PeerInfoMap->GetStartPosition();
+		for(unsigned int j = 0;j < StartIndex;j++) Sim->PeerInfoMap->GetNext(pos);
+		unsigned int StartPeerID = Sim->PeerInfoMap->GetKeyAt(pos), PeerID = StartPeerID;
 		for(unsigned int i = 0;i < NeighborPeerCount;)
 		{
 			if(PeerInfo->IsNeighborPeer(PeerID) == false)
@@ -49,9 +49,9 @@ void CWorkInsertPeer::Simulate(char *Log, char *Dump)
 				PeerInfo->InsertNeighborPeerID(PeerID);
 				i++;
 			}
-			Sim->PeerInfoMap.GetNext(pos);
-			if(pos == NULL) pos = Sim->PeerInfoMap.GetStartPosition();
-			PeerID = Sim->PeerInfoMap.GetKeyAt(pos);
+			Sim->PeerInfoMap->GetNext(pos);
+			if(pos == NULL) pos = Sim->PeerInfoMap->GetStartPosition();
+			PeerID = Sim->PeerInfoMap->GetKeyAt(pos);
 			if(PeerID == StartPeerID) break;
 		}
 	}
@@ -71,10 +71,10 @@ void CWorkInsertPeer::Simulate(char *Log, char *Dump)
 		// Create or get a random content.
 		unsigned int ContentID = Sim->wRand();
 		CContentInfo *ContentInfo;
-		if(Sim->ContentInfoMap.Lookup(ContentID, ContentInfo) == false)
+		if(Sim->ContentInfoMap->Lookup(ContentID, ContentInfo) == false)
 		{
 			ContentInfo = new CContentInfo(ContentID);
-			Sim->ContentInfoMap.SetAt(ContentID, ContentInfo);
+			Sim->ContentInfoMap->SetAt(ContentID, ContentInfo);
 		}
 
 		// Insert a content.
@@ -82,7 +82,7 @@ void CWorkInsertPeer::Simulate(char *Log, char *Dump)
 	}
 
 	// Insert a peer.
-	Sim->PeerInfoMap.SetAt(PeerInfo->PeerID, PeerInfo);
+	Sim->PeerInfoMap->SetAt(PeerInfo->PeerID, PeerInfo);
 
 	// Notify neighbor peers.
 	CWorkQueue WorkQueue;

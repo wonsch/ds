@@ -34,7 +34,7 @@ void CWorkSearchContent::Simulate(char *Log, char *Dump)
 	}
 	else
 	{
-		if(Sim->PeerInfoMap.Lookup(PeerID, PeerInfo) == NULL)
+		if(Sim->PeerInfoMap->Lookup(PeerID, PeerInfo) == NULL)
 		{
 			LogPT+= sprintf(LogPT, "\n    Simulator cannot find the peer. (PeerID = %u)", PeerID);
 			return;

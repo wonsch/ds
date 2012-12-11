@@ -97,6 +97,11 @@ CContentInfo *CSimulatorEx::GetRandomContent()
 	return SI->GetRandomContent();
 }
 
+void CSimulatorEx::SetMaxFloodHopCount(unsigned int MaxFloodHopCount)
+{
+	SI->SetMaxFloodHopCount(MaxFloodHopCount);
+}
+
 void CSimulatorEx::SetGroupMaxMemeberNumber(unsigned int MaxNumber)
 {
 	SI->SetGroupMaxMemeberNumber(MaxNumber);

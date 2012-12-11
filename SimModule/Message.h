@@ -13,7 +13,6 @@ enum EMessage
 	EMESSAGE_NOTIFY_GROUPING,
 	EMESSAGE_TRY_ASKING,
 	EMESSAGE_CONTENT_INFO_UPDATE,
-	
 };
 
 enum EResponseFrom
@@ -57,7 +56,6 @@ public:
 
 
 	//unsigned int								ContentID;
-	unsigned int								ContentPeerID;
 	int											TTL;
 
 	/*========================JIN==================================*/

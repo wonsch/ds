@@ -9,6 +9,11 @@
 CSimulatorIn::CSimulatorIn(unsigned long RandomSeed)
 {
 	Verbose = true;
+
+	WorkQueueMap = NULL;
+	PeerInfoMap = NULL;
+	ContentInfoMap = NULL;
+
 	DumpFile = NULL;
 
 	Reset(RandomSeed);
@@ -20,6 +25,15 @@ CSimulatorIn::~CSimulatorIn()
 
 	// Free all allocated memory
 	DeleteAllData();
+
+	if(WorkQueueMap != NULL) delete WorkQueueMap;
+	if(PeerInfoMap != NULL) delete PeerInfoMap;
+	if(ContentInfoMap != NULL) delete ContentInfoMap;
+}
+
+void CSimulatorIn::SetMaxFloodHopCount(unsigned int MaxFloodHopCount)
+{
+	InitMaxFloodHopCount = MaxFloodHopCount;
 }
 
 /*=====================JIN=======================*/
@@ -43,6 +57,13 @@ void CSimulatorIn::Reset(unsigned long RandomSeed)
 {
 	// Free all allocated memory
 	DeleteAllData();
+
+	if(WorkQueueMap != NULL) delete WorkQueueMap;
+	WorkQueueMap = new CAtlMap<unsigned int, CWorkQueue*>();
+	if(PeerInfoMap != NULL) delete PeerInfoMap;
+	PeerInfoMap = new CAtlMap<unsigned int, CPeerInfo*>();
+	if(ContentInfoMap != NULL) delete ContentInfoMap;
+	ContentInfoMap = new CAtlMap<unsigned int, CContentInfo*>();
 
 	CacheMode = MODE_CACHE_OFF;
 	GroupMode = MODE_GROUPING_OFF;
@@ -73,7 +94,7 @@ void CSimulatorIn::SetEnvironmentDefault()
 	IsRandomEnrivonment = false;
 	InitNeighborPeerCount = 1;
 	InitContentCount = 5;
-	InitMaxFloodHopCount = SIM_MAX_FLOOD_HOP_COUNT;
+	InitMaxFloodHopCount = 6;
 }
 
 void CSimulatorIn::SetEnvironmentRandomly()
@@ -81,7 +102,6 @@ void CSimulatorIn::SetEnvironmentRandomly()
 	IsRandomEnrivonment = true;
 	InitNeighborPeerCount = SIM_RANDOM_VALUE;
 	InitContentCount = SIM_RANDOM_VALUE;
-	InitMaxFloodHopCount = SIM_MAX_FLOOD_HOP_COUNT;
 }
 
 void CSimulatorIn::SetEnvironmentManually(unsigned int InitNeighborPeerCount, unsigned int InitContentCount, unsigned int InitMaxFloodHopCount)
@@ -137,7 +157,7 @@ void CSimulatorIn::DumpFinal()
 	if(DumpFile == NULL) return;
 
 	fprintf(DumpFile, "\n[SIMULATIONINFO]\n");
-	fprintf(DumpFile, "PEERCOUNT=%u\n", PeerInfoMap.GetCount());
+	fprintf(DumpFile, "PEERCOUNT=%u\n", PeerInfoMap->GetCount());
 	fprintf(DumpFile, "CYCLECOUNT=%u\n", Step);
 
 	fclose(DumpFile);
@@ -149,12 +169,12 @@ void CSimulatorIn::DumpPeers()
 	if(DumpFile == NULL) return;
 
 	unsigned int PeerCount = 0;
-	POSITION pos1 = PeerInfoMap.GetStartPosition();
+	POSITION pos1 = PeerInfoMap->GetStartPosition();
 	while(pos1 != NULL)
 	{
 		unsigned int PeerID;
 		CPeerInfo *PeerInfo;
-		PeerInfoMap.GetNextAssoc(pos1, PeerID, PeerInfo);
+		PeerInfoMap->GetNextAssoc(pos1, PeerID, PeerInfo);
 
 		fprintf(DumpFile, "\n[CYCLE%u.PEER%u]\n", Step, ++PeerCount);
 		fprintf(DumpFile, "PID=%u\n", PeerID);
@@ -182,10 +202,10 @@ void CSimulatorIn::InsertWork(unsigned int StepNumber, CWorkQueue *Work, bool At
 
 	// Create a WorkQueue or get an existing WorkQueue at the StepNumber.
 	CWorkQueue *WorkQueue;
-	if(WorkQueueMap.Lookup(StepNumber, WorkQueue) == false)
+	if(WorkQueueMap->Lookup(StepNumber, WorkQueue) == false)
 	{
 		WorkQueue = new CWorkQueue();
-		WorkQueueMap.SetAt(StepNumber, WorkQueue);
+		WorkQueueMap->SetAt(StepNumber, WorkQueue);
 	}
 
 	// Insert the Work
@@ -200,10 +220,10 @@ void CSimulatorIn::InsertWork(unsigned int StepNumber, CWorkBase *Work, bool AtH
 
 	// Create a WorkQueue or get an existing WorkQueue at the StepNumber.
 	CWorkQueue *WorkQueue;
-	if(WorkQueueMap.Lookup(StepNumber, WorkQueue) == false)
+	if(WorkQueueMap->Lookup(StepNumber, WorkQueue) == false)
 	{
 		WorkQueue = new CWorkQueue();
-		WorkQueueMap.SetAt(StepNumber, WorkQueue);
+		WorkQueueMap->SetAt(StepNumber, WorkQueue);
 	}
 
 	// Insert the Work
@@ -214,15 +234,15 @@ void CSimulatorIn::InsertWork(unsigned int StepNumber, CWorkBase *Work, bool AtH
 CPeerInfo *CSimulatorIn::GetRandomPeer()
 {
 	// Get a random peer which exists.
-	POSITION pos = PeerInfoMap.GetStartPosition();
+	POSITION pos = PeerInfoMap->GetStartPosition();
 	if(pos == NULL) return NULL;
 
-	unsigned int StartIndex = wRand() % PeerInfoMap.GetCount();
-	for(unsigned int i = 0;i < StartIndex;i++) PeerInfoMap.GetNext(pos);
+	unsigned int StartIndex = wRand() % PeerInfoMap->GetCount();
+	for(unsigned int i = 0;i < StartIndex;i++) PeerInfoMap->GetNext(pos);
 
 	unsigned int PeerID;
 	CPeerInfo *PeerInfo;
-	PeerInfoMap.GetNextAssoc(pos, PeerID, PeerInfo);
+	PeerInfoMap->GetNextAssoc(pos, PeerID, PeerInfo);
 
 	return PeerInfo;
 }
@@ -230,15 +250,15 @@ CPeerInfo *CSimulatorIn::GetRandomPeer()
 CContentInfo *CSimulatorIn::GetRandomContent()
 {
 	// Get a random content which exists.
-	POSITION pos = ContentInfoMap.GetStartPosition();
+	POSITION pos = ContentInfoMap->GetStartPosition();
 	if(pos == NULL) return NULL;
 
-	unsigned int StartIndex = wRand() % ContentInfoMap.GetCount();
-	for(unsigned int i = 0;i < StartIndex;i++) ContentInfoMap.GetNext(pos);
+	unsigned int StartIndex = wRand() % ContentInfoMap->GetCount();
+	for(unsigned int i = 0;i < StartIndex;i++) ContentInfoMap->GetNext(pos);
 
 	unsigned int ContentID;
 	CContentInfo *ContentInfo;
-	ContentInfoMap.GetNextAssoc(pos, ContentID, ContentInfo);
+	ContentInfoMap->GetNextAssoc(pos, ContentID, ContentInfo);
 
 	return ContentInfo;
 }
@@ -246,21 +266,22 @@ CContentInfo *CSimulatorIn::GetRandomContent()
 CAtlString CSimulatorIn::GetStatistics()
 {
 	unsigned int TotalNeighborCount = 0;
-	POSITION pos = PeerInfoMap.GetStartPosition();
+	POSITION pos = PeerInfoMap->GetStartPosition();
 	while(pos != NULL)
 	{
-		TotalNeighborCount+= PeerInfoMap.GetValueAt(pos)->NeighborPeerIDMap.GetCount();
-		PeerInfoMap.GetNext(pos);
+		TotalNeighborCount+= PeerInfoMap->GetValueAt(pos)->NeighborPeerIDMap.GetCount();
+		PeerInfoMap->GetNext(pos);
 	}
 
 	CAtlString String;
 	String.AppendFormat("RandomSeed : %u\r\n", InitRandomSeed);
+	String.AppendFormat("Max Flood Hop Count : %u\r\n", InitMaxFloodHopCount);
 	String.AppendFormat("CacheMode/GroupMode : %s/%s\r\n", CacheMode == MODE_CACHE_OFF ? "OFF" : "ON", GroupMode == MODE_GROUPING_OFF ? "OFF" : "ON");
-	String.AppendFormat("Total Peers : %u\r\n", PeerInfoMap.GetCount());
-	//String.AppendFormat("Total Contents : %u\r\n", ContentInfoMap.GetCount());
-	String.AppendFormat("Average Number of Contents per Peer : %g\r\n", (double)ContentInfoMap.GetCount() / PeerInfoMap.GetCount());
+	String.AppendFormat("Total Peers : %u\r\n", PeerInfoMap->GetCount());
+	//String.AppendFormat("Total Contents : %u\r\n", ContentInfoMap->GetCount());
+	String.AppendFormat("Average Number of Contents per Peer : %g\r\n", (double)ContentInfoMap->GetCount() / PeerInfoMap->GetCount());
 	//String.AppendFormat("Total Neighbor Peers : %u\r\n", TotalNeighborCount);
-	String.AppendFormat("Average Number of Neighbor per Peer : %g\r\n", (double)TotalNeighborCount / PeerInfoMap.GetCount());
+	String.AppendFormat("Average Number of Neighbor per Peer : %g\r\n", (double)TotalNeighborCount / PeerInfoMap->GetCount());
 	String.AppendFormat("Total Message Count (Traffic) : %u\r\n", StatisticsTotalMessageCount);
 	String.AppendFormat("Total Search Content : %u\r\n", StatisticsTotalSearchContentCount);
 	String.AppendFormat("Total Search Content Success/Failure : %u / %u\r\n", StatisticsTotalSearchContentSuccessCount, StatisticsTotalSearchContentCount - StatisticsTotalSearchContentSuccessCount);
@@ -283,42 +304,51 @@ CAtlString &CSimulatorIn::GetLog()
 void CSimulatorIn::DeleteAllData()
 {
 	// Delete all WorkQueues.
-	POSITION pos = WorkQueueMap.GetStartPosition();
-	while(pos != NULL)
+	if(WorkQueueMap != NULL)
 	{
-		unsigned int Step;
-		CWorkQueue *WorkQueue;
-		WorkQueueMap.GetNextAssoc(pos, Step, WorkQueue);
-		delete WorkQueue;
+		POSITION pos = WorkQueueMap->GetStartPosition();
+		while(pos != NULL)
+		{
+			unsigned int Step;
+			CWorkQueue *WorkQueue;
+			WorkQueueMap->GetNextAssoc(pos, Step, WorkQueue);
+			delete WorkQueue;
+		}
+		WorkQueueMap->RemoveAll();
 	}
-	WorkQueueMap.RemoveAll();
 
 	// Delete all PeerInfos.
-	pos = PeerInfoMap.GetStartPosition();
-	while(pos != NULL)
+	if(PeerInfoMap != NULL)
 	{
-		unsigned int PeerID;
-		CPeerInfo *PeerInfo;
-		PeerInfoMap.GetNextAssoc(pos, PeerID, PeerInfo);
-		delete PeerInfo;
+		POSITION pos = PeerInfoMap->GetStartPosition();
+		while(pos != NULL)
+		{
+			unsigned int PeerID;
+			CPeerInfo *PeerInfo;
+			PeerInfoMap->GetNextAssoc(pos, PeerID, PeerInfo);
+			delete PeerInfo;
+		}
+		PeerInfoMap->RemoveAll();
 	}
-	PeerInfoMap.RemoveAll();
 
 	// Delete all PeerInfos.
-	pos = ContentInfoMap.GetStartPosition();
-	while(pos != NULL)
+	if(ContentInfoMap != NULL)
 	{
-		unsigned int ContentID;
-		CContentInfo *ContentInfo;
-		ContentInfoMap.GetNextAssoc(pos, ContentID, ContentInfo);
-		delete ContentInfo;
+		POSITION pos = ContentInfoMap->GetStartPosition();
+		while(pos != NULL)
+		{
+			unsigned int ContentID;
+			CContentInfo *ContentInfo;
+			ContentInfoMap->GetNextAssoc(pos, ContentID, ContentInfo);
+			delete ContentInfo;
+		}
+		ContentInfoMap->RemoveAll();
 	}
-	ContentInfoMap.RemoveAll();
 }
 
 bool CSimulatorIn::SimulateOneStep()
 {
-	if(WorkQueueMap.GetCount() == 0)
+	if(WorkQueueMap->GetCount() == 0)
 	{
 		// There is no work to simulate.
 		if(Verbose == true) printf("*** Simulation is terminated at step %u\n", Step);
@@ -331,7 +361,7 @@ bool CSimulatorIn::SimulateOneStep()
 
 	// Get the WorkQueue that contains a work list at this Step.
 	CWorkQueue *WorkQueue;
-	if(WorkQueueMap.Lookup(Step, WorkQueue) == false)
+	if(WorkQueueMap->Lookup(Step, WorkQueue) == false)
 	{
 		// There is no works to simulate.
 		goto End;
@@ -363,14 +393,14 @@ bool CSimulatorIn::SimulateOneStep()
 		// Change the environment.
 		if(IsRandomEnrivonment == true) SetEnvironmentRandomly();
 	}
-	WorkQueueMap.RemoveKey(Step);
+	WorkQueueMap->RemoveKey(Step);
 	delete WorkQueue;
 
 	// Dump this step info.
 	if(DumpFile != NULL)
 	{
 		fprintf(DumpFile, "\n[CYCLE%u]\n", Step);
-		fprintf(DumpFile, "PEERNUM=%u\n", PeerInfoMap.GetCount());
+		fprintf(DumpFile, "PEERNUM=%u\n", PeerInfoMap->GetCount());
 		fprintf(DumpFile, "EVENTNUM=%u\n", DumpNumber);
 
 		// Dump peers info.
