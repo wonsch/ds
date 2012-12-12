@@ -62,10 +62,12 @@ public:
 	void										SetContentInfoFloodingTTL(int TTL);
 	/*   JIN    */
 
+	unsigned int								GetMessageKind();
 	unsigned int								GetStatisticsTotalSearchContentCount();
 	unsigned int								GetStatisticsTotalSearchContentSuccessCount();
 	unsigned int								GetStatisticsTotalSearchContentHopCount();
 	unsigned int								GetStatisticsTotalMessageCount();
+	unsigned int								GetStatisticsTotalMessageCountEach(int Index);
 	CAtlString									GetStatistics();
 	CAtlString&									GetLog();
 

@@ -81,6 +81,7 @@ void CSimulatorIn::Reset(unsigned long RandomSeed)
 	StatisticsTotalSearchContentSuccessCount = 0;
 	StatisticsTotalSearchContentHopCount = 0;
 	StatisticsTotalMessageCount = 0;
+	memset(StatisticsTotalMessageCountEach, 0, sizeof(StatisticsTotalMessageCountEach));
 
 	// Set environment to default 
 	SetEnvironmentDefault();
@@ -283,6 +284,11 @@ CAtlString CSimulatorIn::GetStatistics()
 	//String.AppendFormat("Total Neighbor Peers : %u\r\n", TotalNeighborCount);
 	String.AppendFormat("Average Number of Neighbor per Peer : %g\r\n", (double)TotalNeighborCount / PeerInfoMap->GetCount());
 	String.AppendFormat("Total Message Count (Traffic) : %u\r\n", StatisticsTotalMessageCount);
+	for(int i = 0;i < MESSAGE_KINDS;i++)
+	{
+		if(StatisticsTotalMessageCountEach[i] > 0)
+			String.AppendFormat("Total Message Count \"%s\" : %u\r\n", MesssageNames[i], StatisticsTotalMessageCountEach[i]);
+	}
 	String.AppendFormat("Total Search Content : %u\r\n", StatisticsTotalSearchContentCount);
 	String.AppendFormat("Total Search Content Success/Failure : %u / %u\r\n", StatisticsTotalSearchContentSuccessCount, StatisticsTotalSearchContentCount - StatisticsTotalSearchContentSuccessCount);
 	if(StatisticsTotalSearchContentSuccessCount > 0)

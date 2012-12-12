@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SimulatorEx.h"
+#include "Message.h"
 
 class CWorkQueue;
 class CWorkBase;
@@ -56,10 +57,12 @@ public:
 
 	/*   JIN    */
 
+	unsigned int								GetMessageKind() {return MESSAGE_KINDS;}
 	unsigned int								GetStatisticsTotalSearchContentCount() {return StatisticsTotalSearchContentCount;}
 	unsigned int								GetStatisticsTotalSearchContentSuccessCount() {return StatisticsTotalSearchContentSuccessCount;}
 	unsigned int								GetStatisticsTotalSearchContentHopCount() {return StatisticsTotalSearchContentHopCount;}
 	unsigned int								GetStatisticsTotalMessageCount() {return StatisticsTotalMessageCount;}
+	unsigned int								GetStatisticsTotalMessageCountEach(int Index) {return StatisticsTotalMessageCountEach[Index];}
 
 	CAtlString									GetStatistics();
 
@@ -102,6 +105,7 @@ public:
 	unsigned int								StatisticsTotalSearchContentSuccessCount;
 	unsigned int								StatisticsTotalSearchContentHopCount;
 	unsigned int								StatisticsTotalMessageCount;
+	unsigned int								StatisticsTotalMessageCountEach[MESSAGE_KINDS];
 
 	FILE*										DumpFile;
 };

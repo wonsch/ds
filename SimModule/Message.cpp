@@ -1,6 +1,21 @@
 #include "stdafx.h"
 #include "Message.h"
 
+char *MesssageNames[] =
+{
+	"Empty",
+	"NotifyNull",
+	"SearchContent",
+	"SearchContentResponseSource",
+	"SearchContentResponsePath",
+	"AskGrouping",
+	"RejectGrouping",
+	"AcceptGrouping",
+	"NotifyGrouping",
+	"TryAsking",
+	"ContentInfoUdpate",
+};
+
 CMessage::CMessage(unsigned int MessageID)
 {
 	Message = EMESSAGE_EMPTY;

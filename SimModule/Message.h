@@ -1,5 +1,7 @@
 #pragma once
 
+#define MESSAGE_KINDS							11
+extern char *MesssageNames[];
 enum EMessage
 {
 	EMESSAGE_EMPTY = 0,

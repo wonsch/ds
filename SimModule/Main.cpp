@@ -2,7 +2,7 @@
 #include "SimulatorEx.h"
 #include "PeerInfo.h"
 #include "ContentInfo.h"
-#include <math.h>
+#include "Message.h"
 
 #define SIMULATOR_THREAD_COUNT					8
 //#define DUMP
@@ -71,6 +71,7 @@ public:
 	unsigned int								TotalUpdated;
 
 	unsigned int								TotalMessageCount;
+	unsigned int								TotalMessageCountEach[MESSAGE_KINDS];
 	unsigned int								TotalSuccess;
 	unsigned int								TotalFailure;
 	unsigned int								TotalHops;
@@ -104,7 +105,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 		unsigned int GroupCount = 0;
 		if(Job.GroupSize > 0) GroupCount = (Job.PeerCount + (Job.GroupSize - 1)) / Job.GroupSize;
 		Sim.Reset(Job.RandomSeed);
-		Sim.SetVerbose(true);
+		Sim.SetVerbose(false);
 		Sim.SetEnvironmentRandomly();
 		Sim.SetMaxFloodHopCount(Job.MaxFloodHopCount);
 		Sim.SetMode(Job.CacheMode, Job.GroupMode);
@@ -162,6 +163,7 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 			CwLockAuto StatisticsLockAuto(&StatisticsLock[Job.JobKind][Job.PeerKind]);
 			Statistics[Job.JobKind][Job.PeerKind].TotalUpdated++;
 			Statistics[Job.JobKind][Job.PeerKind].TotalMessageCount+= Sim.GetStatisticsTotalMessageCount();
+			for(int i = 0;i < MESSAGE_KINDS;i++) Statistics[Job.JobKind][Job.PeerKind].TotalMessageCountEach[i]+= Sim.GetStatisticsTotalMessageCountEach(i);
 			Statistics[Job.JobKind][Job.PeerKind].TotalSuccess+= Sim.GetStatisticsTotalSearchContentSuccessCount();
 			Statistics[Job.JobKind][Job.PeerKind].TotalFailure+= Sim.GetStatisticsTotalSearchContentCount() - Sim.GetStatisticsTotalSearchContentSuccessCount();
 			Statistics[Job.JobKind][Job.PeerKind].TotalHops+= Sim.GetStatisticsTotalSearchContentHopCount();
@@ -176,6 +178,11 @@ DWORD WINAPI SimulatorThread(LPVOID Argument)
 					fprintf(File, "*** Simulation Statistics\n");
 					fprintf(File, "Repeat Count : %u\n", RepeatCount);
 					fprintf(File, "Average Message Count (Traffic) : %g\n", (double)Statistics[Job.JobKind][Job.PeerKind].TotalMessageCount / RepeatCount);
+					for(int i = 0;i < MESSAGE_KINDS;i++)
+					{
+						if(Statistics[Job.JobKind][Job.PeerKind].TotalMessageCountEach[i] > 0)
+							fprintf(File, "Average Message Count \"%s\" : %g\r\n", MesssageNames[i], (double)Statistics[Job.JobKind][Job.PeerKind].TotalMessageCountEach[i] / RepeatCount);
+					}
 					fprintf(File, "Total Search Content Success/Failure : %u / %u (%g%%)\n", Statistics[Job.JobKind][Job.PeerKind].TotalSuccess, Statistics[Job.JobKind][Job.PeerKind].TotalFailure, (double)Statistics[Job.JobKind][Job.PeerKind].TotalSuccess / (Statistics[Job.JobKind][Job.PeerKind].TotalSuccess + Statistics[Job.JobKind][Job.PeerKind].TotalFailure) * 100);
 					fprintf(File, "Average Number of Hops per Search Content Success : %g\n", (double)Statistics[Job.JobKind][Job.PeerKind].TotalHops / Statistics[Job.JobKind][Job.PeerKind].TotalSuccess);
 
@@ -202,7 +209,7 @@ int main()
 	CJob Job;
 
 	// For ªÛ¿œ
-	Job.Reset();
+	/*Job.Reset();
 	Job.JobKind = 0;
 	Job.PeerKind = 0;
 	Job.RepeatIndex = 1;
@@ -216,7 +223,7 @@ int main()
 	Job.TTL = Job.MaxFloodHopCount;
 	JobList.AddTail(Job);
 
-	/*Job.Reset();
+	Job.Reset();
 	Job.JobKind = 0;
 	Job.PeerKind = 0;
 	Job.RepeatIndex = 1;
@@ -245,7 +252,7 @@ int main()
 	JobList.AddTail(Job);*/
 
 	// For ±§¿«
-	/*CreateDirectory("Statistics", NULL);
+	CreateDirectory("Statistics", NULL);
 	for(int Repeat = 0;Repeat < RepeatCount;Repeat++)
 	{
 		for(int i = 0;i < _countof(PeerCounts);i++)
@@ -291,7 +298,7 @@ int main()
 			Job.TTL = Job.MaxFloodHopCount;
 			JobList.AddTail(Job);
 		}
-	}*/
+	}
 	JobTotal = JobList.GetCount();
 
 	DWORD StartTime = GetTickCount();

@@ -112,6 +112,11 @@ void CSimulatorEx::SetContentInfoFloodingTTL(int TTL)
 	SI->SetContentInfoFloodingTTL(TTL);
 }
 
+unsigned int CSimulatorEx::GetMessageKind()
+{
+	return SI->GetMessageKind();
+}
+
 unsigned int CSimulatorEx::GetStatisticsTotalSearchContentCount()
 {
 	return SI->GetStatisticsTotalSearchContentCount();
@@ -130,6 +135,11 @@ unsigned int CSimulatorEx::GetStatisticsTotalSearchContentHopCount()
 unsigned int CSimulatorEx::GetStatisticsTotalMessageCount()
 {
 	return SI->GetStatisticsTotalMessageCount();
+}
+
+unsigned int CSimulatorEx::GetStatisticsTotalMessageCountEach(int Index)
+{
+	return SI->GetStatisticsTotalMessageCountEach(Index);
 }
 
 CAtlString CSimulatorEx::GetStatistics()

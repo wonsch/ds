@@ -140,11 +140,12 @@ void CWorkSendMessage::Simulate(char *Log, char *Dump)
 
 	LogPT+= sprintf(LogPT, ")\n");
 
+	Sim->StatisticsTotalMessageCount++;
+	Sim->StatisticsTotalMessageCountEach[Message->Message]++;
+
 	// Insert the message into next step.
 	CWorkRecvMessage *WorkRecvMessage = new CWorkRecvMessage(Sim, SrcPeerID, DstPeerID);
 	WorkRecvMessage->Message = Message;
 	Message = NULL;
 	Sim->InsertWork(Sim->Step + 1, WorkRecvMessage);
-
-	Sim->StatisticsTotalMessageCount++;
 }
